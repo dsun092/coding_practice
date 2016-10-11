@@ -15,3 +15,42 @@ def isUniqueLinear(input_str):
             test_dict[input_str[i]] = 1
     return True
 
+def paliPerm(input_str):
+    test_dict = {}
+    for i in xrange(len(input_str)):
+        if input_str[i] in test_dict:
+            test_dict[input_str[i]] += 1
+        else:
+            test_dict[input_str[i]] = 1
+    if len(input_str) % 2 == 0:
+        for k,v in test_dict.items():
+            if v % 2 != 0:
+                return False
+        return True
+    else:
+        numOdd = 0
+        for k,v in test_dict.items():
+            if v == 1:
+                numOdd += 1
+            elif v % 2 != 0:
+                return False
+        if numOdd > 1:
+            return False
+        else:
+            return True
+
+def oneAway(inputA, inputB):
+    if len(inputA) - len(inputB) > 1:
+        return False
+    else:
+        if abs(len(inputA) - len(inputB)) == 1:
+            numDiff = 1
+        else:
+            numDiff = 0
+        for i in xrange(len(inputA)):
+            if i < len(inputB):
+                if inputA[i] != inputB[i]:
+                    numDiff += 1
+                if numDiff > 1:
+                    return False
+        return True
