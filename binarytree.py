@@ -4,6 +4,7 @@ class Node:
         * key, val pair where key is comparable between nodes
         * left  child
         * right child
+        * Red/Black node: 0 for black, 1 for red
         + compare: compares current node key with input key. Return -1, 0, or 1
     '''
     def __init__(self, key, val):
@@ -12,6 +13,7 @@ class Node:
         self.left = None
         self.right = None
         self.count = 1
+        self.color = 1
 
     def compare(self, key):
         '''
@@ -27,6 +29,9 @@ class Node:
             return 0
 
 class BinaryTree:
+    '''
+    Update 10-14 to RB tree
+    '''
     def __init__(self):
         self.root = None
 
@@ -50,7 +55,11 @@ class BinaryTree:
         '''
         Inserts key, val pair into tree
         '''
-        self.root = self._put(self.root, key, val)
+        if self.root is None:
+            self.root = Node(key, val)
+            self.root.color = 0
+        else:
+            self.root = self._put(self.root, key, val)
 
     def _put(self, node, key, val):
         '''
@@ -65,7 +74,11 @@ class BinaryTree:
             node.right = self._put(node.right, key, val)
         else:
             node.val = val
-        node.count = 1 + self._size(node.left) + self._size(node.right)
+        if node.left.left is not None and self._isRed(node.left.left) == True:
+            node = self._rightRotation(node)
+        if self._isRed(node.left) == False:
+            node = self._leftRotation(node)
+        self._colorFlip(node)
         return node
 
     def minVal(self):
@@ -170,6 +183,66 @@ class BinaryTree:
             return 1 + self._size(node.left) + self._rank(node.right, key)
         else:
             return self._size(node.left)
+
+    def delete(self, key):
+        self.root = self._delete(self.root, key)
+
+    def _delete(self, node, key):
+        if node is None:
+            return None
+        comp = node.compare(key)
+        if comp < 0:
+            node.left = self._delete(node.left, key)
+        elif comp > 0:
+            node.right = self._delete(node.right, key)
+        else:
+            if node.left is None:
+                return node.right
+            if node.right is None:
+                return node.left
+            temp = node
+            min_right = node.right
+            while min_right.left is not None:
+                min_right = min_right.left
+            node = min_right
+            node.right = self._deleteMin(temp.right)
+            node.left = temp.left
+        node.count = 1 + self._size(node.left) + self._size(node.right)
+        return node
+
+    def _deleteMin(self, node):
+        if node.left is None:
+            return node.right
+        node.left = self._deleteMin(node.left)
+        node.count = 1 + self._size(node.left) + self._size(node.right)
+        return node
+
+    def _leftRotation(self, node):
+        if self._isRed(node.right) == True:
+            right = node.right
+            right.left = node
+            node.color = right.color
+            right.color = 1
+            return right
+        return node
+    def _rightRotation(self, node):
+        if self._isRed(node.left) == True:
+            left = node.left
+            left.right = node
+            node.color = left.color
+            left.color = 1
+            return left
+        return node
+    def _colorFlip(self, node):
+        if self._isRed(node) == False and self._isRed(node.left) == True and self._isRed(node.right) == True:
+            node.color = 1
+            node.left.color = 0
+            node.right.color = 0
+
+    def _isRed(self, node):
+        if node is None:
+            return False
+        return node.color == 1
 
     def inordertraversal(self, node):
         '''

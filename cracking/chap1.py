@@ -15,6 +15,25 @@ def isUniqueLinear(input_str):
             test_dict[input_str[i]] = 1
     return True
 
+
+def isPerm(first_string, second_string):
+    first_string = list(first_string)
+    second_string = list(second_string)
+    first_string.sort()
+    second_string.sort()
+    if len(first_string) != len(second_string):
+        return False
+    else:
+        for x in xrange(len(first_string)):
+            if first_string[x] != second_string[x]:
+                return False
+        return True
+
+def urlify(input_string):
+    inp_str = input_string.strip().split(' ')
+    return '%20'.join(inp_str)
+
+
 def paliPerm(input_str):
     test_dict = {}
     for i in xrange(len(input_str)):
