@@ -36,6 +36,12 @@ def bfs(g, start):
                 vertQueue.enqueue(neighbor)
         current.color = 2
 
+def dfs(g, start):
+    start.color = 1
+    for neighbor in start.getConnections():
+        if neighbor.color == 0:
+            dfs(g, neighbor)
+
 def traverse(end):
     if end.pred is not None:
         traverse(end.pred)
