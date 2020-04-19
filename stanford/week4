@@ -1,0 +1,63 @@
+Binary Heaps
+Based on complete balance binary tree.
+
+Heap Order (max heap)
+Largest key is arr[1]
+
+the key at index x is larger than both of its children.
+If a node is at index k,
+    its children are 2k and 2k+1
+    its parent is at k/2
+
+public class Heap
+
+    Comparable[] arr
+    int capacity
+    int currentEnd
+
+    1. For an item at k, we check k against parent
+    2. If k is greater than parent, we swap it with parent
+    3. Repeat until k is not greater than parent or we are at top
+    private void swim(int k)
+        while (k > 1 && arr[k/2] < arr[k])
+            swap(arr[k], arr[k/2])
+            k = k/2
+
+    1. For item at k, we check k against its children
+    2. Amongst its children, we take the larger child.
+    3. If item at k is smaller than the larger child, we swap it.
+    4. Repeat until k is bigger than both children or until we hit the end.
+    private void sink(int k)
+        while (2k < currentEnd)
+            int j = 2k
+            if (j < currentEnd && arr[j] < arr[j+1])
+                j++
+            if arr[k] > arr[j]
+                break
+            swap(arr[k], arr[j])
+            k = j
+
+    1. If theres room in heap, insert at the end
+    2. Swim it up until it finds its place.
+    public void insert(Comparable item)
+        if currentEnd+1 < capacity
+            currentEnd = currentEnd + 1
+            arr[currentEnd] = item
+            swim(currentEnd)
+        else
+            throw new Exception("Out of Capacity for heap")
+
+    1. We take item at top of heap
+    2. Swap the bottom of heap with item at top
+    3. Decrement currentEnd by 1
+    4. Sink new top down until it finds correct spot
+    5. Return saved max
+    public Comparable[] popMax()
+        Comparable max = arr[1];
+        arr[1] = arr[currentEnd]
+        currentEnd = currentEnd - 1
+        sink(1)
+        arr[currentEnd+1] = null
+        return max
+
+

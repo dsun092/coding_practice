@@ -1,0 +1,83 @@
+1D Search Range
+
+Problem 1:
+Imagine you have a bunch of random points in plane and you arbitrarily draw a rectangle.
+How many points are in rectangle?
+
+Problem 2:
+Image in you have a bunch of rectangles in a plane.
+Given a rectangle, how many rectangles intersect with it?
+
+For now let's say we just are in a one dimensional space. We can use our symbol table as before.
+
+1. insert k-v pair
+2. search for k
+3. delete k
+4. Range Search: find all keys between k1 and k2
+5. Range count: number of keys between k1 and k2
+
+Assuming we have BTS that keeps track of size.
+
+def rangeCount(Key low, Key high)
+    if (contains(high))
+        return rank(high) - rank(low) + 1
+    else
+        return rank(high) - rank(low)
+
+def rangeSearch(Key low, Key high)
+    Node[] result = []
+    boundedTraversal(root, Key low, Key high, result)
+
+def boundedTraversal(Node n, Key low, Key high, result)
+    if n == null
+        return
+    if n.key < low
+        return
+    if n.key > high
+        return
+    boundedTraversal(n.left, Node bottom, Node top)
+    result.append(n)
+    boundedTraversal(n.right, Node bottom, Node top)
+
+Problem 2:
+Given N horizontal and vertical line segments, find all the intersections
+
+Sweep line algorithm
+Think of a vertical line that sweeps from left to right through the data.
+
+Every time the line hits a line, we gotta do something.
+
+1. When we hit the left point of a horizontal line, we add the Y value it to a BST
+2. When we hit the right coordinate of a horizontal line, we remove the Y value for that line from BST
+3. When we hit a vertical line, we do a range search between the start vertical boundaries of line.
+
+kd-trees
+Now we have 2d points as keys in a BST. And we can perform 2d rangeSearch in this.
+
+For example imagine we have database of people age and income.
+Find all the people that are between ages 25-40 with income between 100k to 500k
+
+Grid implementation
+Pre-Process
+1. Divide the space into a list of M by M grid of squares.
+2. For each square, create a list of points in the square.
+3. Use 2d array to directly index relevant squares.
+
+Inserts:
+when inserting (x,y), find its square(s) that it falls under and insert it into
+
+Range search:
+Examine only the squares that intersect 2d range query and process the points in that query.
+
+Space tradeoff
+M^2 for all the grids since we create a M x M grid
+N for all the points
+
+Time
+The time it takes to examine all the points in a square is N/M^2 assuming we have even distribution
+
+Rule of thumb when choosing M size is that M ~= sqrt(N). This is simple for evenly distributed
+points however in the real world we often see clustering problems.
+
+We want a data structure that can gracefully adapt to this.
+

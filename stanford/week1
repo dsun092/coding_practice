@@ -1,0 +1,116 @@
+Steps towards designing a nice algorithm
+1. model the problem: what are we trying to solve
+2. Find algorithm/data structure
+3. speed and memory constraints
+4. iterate until satisfied
+
+Problem: We want to be able to quickly see if two items are connected to each other.
+
+Solution: Union Find data structure.
+1. should be able to connect two sets of things together
+2. quickly find if two arbitrary items are connected
+
+public interface UF
+    void union(int a, int b)
+    boolean connected(int a, int b)
+
+Data structure 1: Quick Find
+Assume we have an array of size n and the parent of an item at index x is the value.
+arr[2] = 4 <- 2 is connected to 4 and 4 is the parent of 2.
+
+public class QF implements UF
+    public class QF(int n)
+        val arr = new Array[Int](n)
+
+    1. To do a union of the 2 we arbitrarily assign a to b
+    2. find all values in arr where arr[i] == arr[a] and set them to arr[b]
+    void union(int a, int b)
+        // we pick to always assign the parent of a to b
+        val parentOfB = arr[b]
+        val parentOfA = arr[a]
+        for x <- arr.length {
+            if (arr[x] == parentOfA) arr[x] = parentOfB
+        }
+
+    boolean connected(int a, int b)
+        return arr[a] == arr[b]
+
+Size Constraints:
+The data structure is limited by the initial N and does not grow so we can have at most N items
+
+Speed Constraints:
+connected is constant speed because it does index lookup
+union takes N times each time we want to connect so to perform a union N times, it will take N^2 times.
+
+
+Approach 2: Quick Union
+When we do union, we find the root of both values and arbitrarily merge the items at the room.
+
+public class QU implements UF
+    public QU(int n)
+        val arr = new Array[Int](n)
+
+    1. Find root of value by keep following until we reach to a point where a = arr[a]
+    private int root(int a)
+        var currentVal = a
+        while (currentVal != arr[currentVal]) {
+            currentVal = arr[currentVal]
+        }
+        return currentval
+
+    2. Find root of both a and b and set arr[A] to root of B
+    void union(int a, int b)
+        val rootA = root(a)
+        val rootB = root(b)
+        arr[rootA] = rootB
+        return
+
+    1. Check if rootA and rootB are equal
+    void connected(int a, int b)
+        val rootA = root(a)
+        val rootB = root(b)
+        return rootA == rootB
+
+Size Constraints:
+same as above
+
+Speed Constraints:
+Technically performs worse because on every operation we traverse up to find the root.
+
+Approach 3: Collapsing the tree during quick union
+Keep a separate size array to keep track of size of the root
+
+public class OptimizedQU implements UF
+    public OptimizedQU(int n)
+        val arr = new Array[Int](n)
+        val size = new Array[Int](n).withInitialValues(1)
+
+    1. When finding root, go ahead and assign the parent of current item to its grandparent
+    2. this flattens the tree everytime we traverse
+    private int root(int a)
+        var currentVal = a
+        while (currentVal != arr[currentVal]) {
+            arr[currentVal] = arr[arr[currentVal]]
+            currentVal = arr[currentVal]
+        }
+        return currentVal
+
+    1. When doing union, we always want to merge the smaller tree to larger tree
+    2. The height of tree increase at most by 1 when we actually do a union of trees.
+    3. When we union trees, we double the size of current union and we can at most merge
+        into a union lg(N) times.
+    void union(int a, int b)
+        val rootA = root(a)
+        val rootB = root(b)
+        if rootA == rootB return
+        if (size[rootA] > size[rootB])
+            arr[rootB] = rootA
+            size[rootB] += size[rootA]
+        else
+            arr[rootA] = rootB
+            size[rootA] += size[rootB]
+        return
+
+    void connected(int a, int b)
+        val rootA = root(a)
+        val rootB = root(b)

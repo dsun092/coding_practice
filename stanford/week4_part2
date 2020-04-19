@@ -1,0 +1,121 @@
+Symbol Tables
+
+Using BST to implement a symbol table
+
+public class Node {
+    Key key
+    Value val
+    int size
+    Node left, right
+
+    public Node(Key key, Value, value)
+        key = key
+        value = value
+        left = right = null
+        size = 1
+}
+
+
+public class BST
+    private Node root
+
+    public int size()
+        return size(root)
+
+    private int size(Node n)
+        if n == null return 0
+        return x.count
+
+    public void put(Key key, Value val) {
+        root = put(root, key, val)
+    }
+
+    private Node put(Node x, Key key, Key val)
+        if x == null return new Node(key, val, 1)
+        if key > x.val
+            x.right = put(x.right, key, val)
+
+        else if key < x.val
+            x.left = put(x.left, key, val)
+        else
+            x.val = key
+        x.size = 1 + size(x.left) + size(x.right)
+        return x
+
+    public Value get(Key key)
+        val currentNode = root;
+        while (currentNode != null)
+            if (key > currentNode.key)
+                currentNode = currentNode.right
+            else if (key < currentNode.key)
+                currentNode = currentNode.left
+            else
+                return currentNode.val
+        return null
+
+    public Node floor(Key key)
+        floor(root, key)
+
+    private Node floor(Node n, Key key)
+        if n == null return null
+        if n.key == key
+            return n
+        if key < n.key
+            return floor(n.left, key)
+        else
+            potentialRight = floor(n.right, key)
+            if potentialRight == null
+                return n
+            else
+                return potentialRight
+
+    public int rank(Key k)
+        rank(root, k)
+
+    private int rank(Node n, Key k)
+        if k == n.key
+            return size(n)
+        else if k < n.key
+            return rank(n.left, k)
+        else
+            return 1 + size(n.left) + rank(n.right, k)
+
+    public Node min(Node n)
+        val temp = n
+        while (temp.left != null)
+            temp = temp.left
+        return temp
+
+    public Node deleteMin(Node n)
+        if n.left == null
+            return x.right
+        else
+            x.left = deleteMin(n.left)
+            x.count = 1 + size(x.left) + size(x.right)
+            return x
+
+    public Node delete(Key k)
+        delete(root, k)
+
+    private Node delete(Node n, Key k)
+        if n == null return null
+        if (k == n.key)
+            if n.left == null
+                return n.right
+            else if n.right == null
+                return n.left
+            else
+                Node replacement = min(n.right)
+                replacement.right = deleteMin(n.right)
+                replacement.left = n.left
+                n = replacement
+        else if (k < n.key)
+            n.left = delete(n.left, k)
+        else
+            n.right = delete(n.right, k)
+        n.count = size(n.left) + size(n.right) + 1
+        return n
+
+    public void remove(Key key)
+
+    public Iterable<Key> iterator()

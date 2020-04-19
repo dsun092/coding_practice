@@ -1,0 +1,92 @@
+Sorting
+
+Merge Sort
+1. Divide array into 2 half
+2. Recursively sort each half
+3. Merge the two half in sorted fashion.
+
+public class Merge
+
+    void merge(Comparable[] a, Comparable[] aux, int lo, int mid, int hi)
+        for (int i = lo; i <= hi; i++)
+            aux[i] = a[i]
+
+        int lowIndex = lo
+        int highIndex = mid+1
+        for(int i = lo; i <= hi; i++)
+            if (lowIndex == mid)
+                a[i] = aux[highIndex]
+                highIndex++
+            else if (highIndex == hi)
+                a[i] = aux[lowIndex]
+                lowIndex++
+            else if (a[lowIndex] <= a[highIndex])
+                a[i] = a[lowIndex]
+                lowIndex++
+            else
+                a[i] = a[highIndex]
+                highIndex++
+
+    void sort(Comparable[] a, Comparable[] aux, int lo, int hi)
+        if lo >= hi return;
+
+        int mid = (hi + lo) / 2
+        sort(a, aux, lo, mid)
+        sort(a, aux, mid+1, hi)
+        merge(a, aux, lo, mid, hi)
+
+    void sort(Comparable[] a)
+        aux = new Comparable[] aux
+        sort(a, aux, 0, a.length-1)
+
+Bottom Up Merge Sort
+problem with merge sort is that it uses recursion which takes up space on the stack. This approach eliminates that weakness
+
+public class BottomUpMerge
+
+    void merge(Comparable[] a, Comparable[] aux, int lo, int mid, int hi)
+        same as above
+
+    void sort(Comparable[] a)
+        aux = new Comparable[]
+        int N = a.length
+        if (N < 1)
+            return
+
+        for (int i = 1; i < N; i = i+i)
+            for (int lo = 0; lo < N; lo = lo +2 * i)
+                merge(a, aux, lo, lo+i-1, Math.min(i+sz+sz-1, N-1))
+
+
+public class QuickSort
+
+    int partition(Comparable[] a, int lo, int hi)
+        int i = lo+1
+        int j = hi
+        while (true)
+            while(a[i] < a[lo])
+                i++
+                if i == hi
+                    break;
+            while(a[j] > a[lo])
+                j--
+                if j == lo
+                    break;
+            if i >= j
+                break;
+            swap(a, i, j)
+
+        swap(a, lo, j)
+        return j
+
+    void sort(Comparable[] a, int lo, in hi)
+        if (hi <= lo) return;
+        int j = partition(a, lo, hi)
+        sort(a, lo, j-1)
+        sort(a, j+1, hi)
+
+    void sort(Comparable[] a)
+        shuffle(a)
+        sort(a, 0, a.length-1)
+
+

@@ -1,0 +1,93 @@
+Stacks and Queues
+
+Stacks: LIFO
+We always remove the item that was last added
+
+public interface Stack[T]
+    void push(T item)
+    T pop()
+    boolean isEmpty()
+    int size()
+
+Approach 1: Using Linked List
+
+public class Node[T]
+    Node next
+    [T] item
+
+public class LinkedList[T]
+    Node head
+    Node tail
+
+    void addBegin(T item)
+        val node = new Node()
+        node.value = item
+        node.next = head
+        head = node
+
+    void addEnd(T item)
+        val node = new Node()
+        node.value = item
+        tail.next = Node
+        tail = T
+
+    T removeEnd()
+        var currentNode = head
+        while (currentNode.next != tail)
+            currentNode = currentNode.next
+        tail = currentNode
+        val returnVal = tail.next.value
+        tail.next = None
+        returnVal
+
+    T removeFront()
+        val current = head
+        val returnVal = current.value
+        head = head.next
+        current = null
+
+        return returnVal
+
+
+public class LinkedListStack implements Stack
+    val ll = new LinkedList[T]
+
+    void push(T item)
+        ll.addBegin(item)
+
+    void T pop()
+        return ll.removeFront()
+
+
+public class ArrayStack implements Stack
+
+    val arr
+    val int capacity
+    val int curr = 0
+
+    public ArrayStack(int n)
+        capacity = n
+        arr = new Array(n)
+
+    void push(T item)
+        if curr < capacity
+            arr[curr] = item
+            curr += 1
+        else
+            throw new Exception("Max capacity reached")
+
+    T pop()
+        val returnVal
+        if (curr > 0)
+            curr -= 1
+            returnVal = arr[curr]
+            arr[curr] = null
+            return returnVal
+        else
+            throw new Exception("Nothing to pop")
+
+Queues: Basically the same but just pop should remove from end of the Queue
+
+Resizing Array
+1. We want to double in size by 2 when we hit 100% cap.
+2. We want to reduce in size by half when we hit 25% capacity.
