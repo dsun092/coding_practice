@@ -80,4 +80,41 @@ Rule of thumb when choosing M size is that M ~= sqrt(N). This is simple for even
 points however in the real world we often see clustering problems.
 
 We want a data structure that can gracefully adapt to this.
+How do we make a partition plane?
+
+1. When we first insert a node, we partition the plan vertically by this where we say,
+    Everything to left of point is on the left space
+    Everything to right of the point is on the right space.
+2. When we insert a child into a vertical partition, we say now its a horizontal partition.
+    Everything to left of point is below it on space
+    Everything to right of point is above it in space
+
+Interval Search
+
+1d interval search. Data structure to hold set of overlapping intervals
+
+API Operations:
+1. Insert an interval (low, high)
+2. Search for an interval (low, high)
+3. Delete an interval (low, high)
+4. Interval intersection query: given an interval (low, high) find all intervals that intersects
+
+Idea
+We use a BST but we use the left endpoint of an interval as the BST Key
+At every node, we store the max endpoint in subtree rooted at that node.
+
+Interval Intersection Search to find one that intersect
+1. If interval in node insects query interval, return it
+2. Else if left subtree is null, go right
+3. Else if max endpoint in left subtree is less than low, go right
+4. Else go left.
+
+Some basic proofs.
+If we go right, it means that there are no intersections to the left
+
+1. if no left subtree its obvious
+2. if left has subtree but the largest end interval in left is smaller than low of search interval,
+    we know that left side cannot possibly have a interval that intersects it.
+
+If we go left, it means that there are no intersections to the right.
 

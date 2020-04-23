@@ -1,0 +1,64 @@
+Week 6 HashTabls
+
+If we do not need ordered operations we can use hash tables
+
+Save items in key-indexed table.
+We use a hash function for computing array index from a given key.
+
+Issues:
+1. Computing hash function can be complicated for complex data types
+2. Equality types, we need method for checking whether two keys are equal.
+3. Collision resolution: Algorithm and data structure to handle two keys that hash to same index.
+4. Space and time limitation:
+
+Hash Functions: The goal is to scramble the keys uniformly to produce a table index.
+1. must be efficient to compute
+2. each table index equally likely for each key.
+
+Requirements
+1. if x.equals(y) then x.hashCode() == y.hashCode()
+
+Highly desirable
+1. if !x.equals(y) then x.hashCode() != y.hashCode()
+
+Default implementation of java is to use memory address of object.
+
+Separate Chaining HashTables
+Each entry in hashtable will be represented as an array of linked lists.
+
+To get an object,
+1. compute hash key and look up index in array
+2. traverse down the linked list at index if not empty until you get to key.
+
+To put an object
+1. compute hash key and look up index in array
+2. traverse down the linked list at index.
+    if key is found, replace the val
+    if not then add a new node with key, val at beginning of linked list.
+
+Cost analysis
+under uniform hashing assumption, probability that the number of keys in a list is within a constant factor of N / M where N is number of items and M is number of bins.
+
+Consequence.
+1. number of probes for search/insert is around N / M
+2. if M is too big, lots of empty chains
+    if M is too small, you get long chains and reduced performance.
+
+3. Typically try to do M ~ N/5
+
+Linear Probing
+1. hash key to index between 0 and M-1
+insert: put at index if free, if not try i+1, i+2 until cannot try
+search: search at index i, if occupied but no match, keep going i+1, i+2, etc until empty position or end of array
+
+Array size M must be greater than number of keys.
+
+Separate chaining
+1. easier to implement delete
+2. performance degrades gracefully
+3. clustering less sensitive to poorly designed hash
+
+Linear probing
+1. less wasted space
+2. better cache performance.
+

@@ -33,7 +33,7 @@ public class QF implements UF
         }
 
     boolean connected(int a, int b)
-        return arr[a] == arr[b]
+        return arr[a] == arr[b] // simple comparison
 
 Size Constraints:
 The data structure is limited by the initial N and does not grow so we can have at most N items
@@ -52,17 +52,18 @@ public class QU implements UF
 
     1. Find root of value by keep following until we reach to a point where a = arr[a]
     private int root(int a)
-        var currentVal = a
-        while (currentVal != arr[currentVal]) {
-            currentVal = arr[currentVal]
+        // For a given point a, we say the parent of a is arr[a]
+        var currentVal = a // start at given value
+        while (currentVal != arr[currentVal]) { // while the current value at index is not equal to entry at index
+            currentVal = arr[currentVal] // we follow it up
         }
         return currentval
 
     2. Find root of both a and b and set arr[A] to root of B
     void union(int a, int b)
-        val rootA = root(a)
-        val rootB = root(b)
-        arr[rootA] = rootB
+        val rootA = root(a) // get the root of a
+        val rootB = root(b) // get root of b
+        arr[rootA] = rootB // we set the root of a to root of b
         return
 
     1. Check if rootA and rootB are equal
@@ -90,8 +91,8 @@ public class OptimizedQU implements UF
     private int root(int a)
         var currentVal = a
         while (currentVal != arr[currentVal]) {
-            arr[currentVal] = arr[arr[currentVal]]
-            currentVal = arr[currentVal]
+            arr[currentVal] = arr[arr[currentVal]] // we assign the parent value at currentVal to its parent's parent
+            currentVal = arr[currentVal] // we go visit it's parent.
         }
         return currentVal
 
