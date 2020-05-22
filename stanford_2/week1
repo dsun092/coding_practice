@@ -1,0 +1,87 @@
+Undirected Graphs.
+
+Graph
+A set of vertices connected pairwise by edges.
+
+Path
+Sequence of vertices connected by edges
+
+Cycle
+Path whose first and last vertices are the same
+
+Some graph problems:
+Does a path exist between s and t?
+What is the shortest path between s and t?
+Is there a cycle in the graph?
+Is there a cycle that uses each edge exactly once? Euler Tour
+Is there a cycle that uses each vertex exactly once? Hamilton Tour
+Is there a way to connect all of the vertices? Connectivity
+What is the best way to connect all of the vertices? Minimum Spanning Tree
+
+Graph APIs
+Most common representation of Graphs: Adjacency-list Graph
+Maintain a vertex indexed array of lists
+For each entry that represents a vertex, we maintain a list of adjacent vertex
+
+public class Graph
+    Graph(int V) // create an empty graph with V vertices
+    void addEdge(int v, int w) // add an edge from v to w
+    Iterable<Integer> adj(int v) // vertices adjacent v
+    int V() // number of vertices in the graph
+    int E() // number of edges in the grapg
+
+
+Depth First Search
+
+How do we design?
+1. we have a graph object that is decoupled from the processing logic.
+2. we pass the graph object to the processing routine
+3. Client can query the graph processing routine for information
+
+DFS basic intuition
+1. process current vertex
+2. recursively process its neighbors if have not been processed yet
+
+BFS
+1. process vertex
+2. process all of its neighbors
+    a. if neighbor has not been processed, process it and add it to queue.
+
+
+BFS also gives shortest path from source to any vertex it can travel to.
+
+Connect Components
+Definition: vertices v and w are connected if there is a path between them.
+
+Goal: Preprocess graph to answer queries like is v connected to w in constant time.
+
+public class ConnectComponents
+    public ConnectComponents(Graph g)
+
+    boolean connected(int v, int w) // are 2 vertices connected?
+
+idea is we maintain a separate mapping of the vertices to a "cluster id".
+use BFS to go through the graph and assign each vertex to a "cluster id".
+
+dfs(Graph g)
+    clusterId = 0
+    marked = []
+    cc = []
+    for vertex in g:
+        dfs(vertex, marked, cc, clusterId)
+        clusterId += 1
+
+dfs(vertex, marked, cc, clusterId)
+    if !marked[vertex]:
+        marked[vertex] = true
+        cc[vertex] = clusterId
+        for neighbor in vertex.neighbors:
+            dfs(neighbor, marked, cc, clusterId)
+
+Graph-processing Challenges
+Problem 1: Is a graph bipartite?
+How difficult? simple bfs
+
+Problem 2: Find a cycle in a graph?
+How difficult? simple dfs
+

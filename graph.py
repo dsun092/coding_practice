@@ -29,21 +29,26 @@ class Graph:
             self.vertList[key] = vert
             self.numVert = self.numVert + 1
             return vert
+
     def getVertex(self, key):
         if key in self.vertList:
             return self.vertList[key]
         else:
             return None
+
     def __contains__(self, n):
         return n in self.vertList
+
     def addEdge(self, origin, dest, weight=0):
         if origin not in self.vertList:
             origin_v = self.addVertex(origin)
         if dest not in self.vertList:
             dest_v = self.addVertex(dest)
         self.vertList[origin].addConnection(self.vertList[dest], weight)
+
     def getVertices(self):
         return self.vertList.keys()
+
     def resetGraph(self):
         keys = self.vertList.keys()
         for k in keys:

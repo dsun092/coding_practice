@@ -1,0 +1,196 @@
+Maybe some better sorting?
+
+Key-Indexed Counting
+If we are trying to sort things by group, we might have a better way to sort things.
+
+If we know ahead of time that our keys are range bounded, we can simply count the number of occurences in each key assuming they have some incremental order.
+
+1. Iterate through keys and count the number of occurences of each key and store it in a keys array.
+2. Go through the keys array and compute the range of each key.
+3. Based on the range of each key, iterate through original array and place each key in it's range bounded index.
+4. Copy from the aux to original array maybe.
+
+Run time.
+
+Let's say our original array is N and its got R unique keys. This method would take ~3N + R time to sort N items whose keys are integers between 0 and R-1.
+
+Key-indexed counting uses extra space porportional to N + R.
+
+Stable? Yes, since we move them according to the orders that they were seen.
+
+LSD Radix Sort
+* Consider the characters from right to left.
+* Stably sort using d-th characters as key (using key-indexed counting).
+
+1. Use key-indexed sort to sort by the right most character.
+2. Pass through and this time sort by R-2, then R-3 until we sort by the left most column.
+3. By the time we sort by the left most column, we will end with a stable sort of the strings.
+
+public class LSD
+    public static void sort(String[] a, int W) // only works if all strings are fixed length
+        int R = 256; // <- radix R size of array we use for each count
+        int N = a.length;
+        String[] aux = new String[N]
+
+        for(int d = W-1; d >= 0; d--)
+            int count[] = new int[R+1];
+            for (int i = 0; i < N; i++)
+                count[a[i].charAt(d) + 1]++ // increment the count for char i in current
+            for (int r = 0; r < R; r++)
+                count[r+1] += count[r];
+            for (int i = 0; i < N; i++)
+                aux[count[a[i].charAt(d)]++] = a[i];
+            for(int i = 0; i < N; i++)
+                a[i] = aux[i];
+
+Performance:
+Guarantees 2*W*N where W is the length of the string and N is number of items.
+If W is small, this becomes linear.
+Extra Space:
+uses N + R extra space.
+
+Another example:
+How would you sort a million 32-bit integers?
+Since each bit is either a 0 or a 1, you can use LSD Radix sort to sort this in 2 * 32 * 1mil using 1mil + 2 extra space.
+
+MSD Radix Sort
+* Partition array into R pieces according to first character (use key-index counting)
+* Recursively sort all strings that start with each character.
+
+Can handle Variable-length strings
+* Treat strings as if they had an extra char at end like a -1.
+* C Strings have an extra \0 bit at the end so we don't need this extra -1.
+
+public class MSD
+    public static void sort(String[] a)
+        aux = new String[a.length]
+        sort(a, aux, 0, a.length-1, 0)
+
+    private static void sort(String[] a, String[] aux, int lo, int hi, int d)
+        if (hi <= lo) return;
+        int[] count = new int[R+2];
+        for (int i = lo; i <= hi; i++)
+            count[charAt(a[i], d) + 2]++;
+        for (int r = 0; r < R+1; r++)
+            count[r+1] += count[r];
+        for(int i = lo; i<= hi; i++)
+            aux[count[charAt(a[i], d) + 1]++] = a[i];
+        for (int i = lo; i <= hi; i++)
+            a[i] = aux[i-lo];
+        for (int r = 0; r < R; r++)
+            sort(a, aux, lo + count[r], lo +[count[r+1] - 1, d+1)
+
+
+    private static int charAt(String s, int d)
+        if (d < s.lengt) return s.charAt(d);
+        else return -1;
+
+Observation 1: Much too slow for small subarrays.
+* each function call needs its own count[] array. Let's say N = 2 but you still need count[] of size 256 for each character thus each key-index sort will be 100x slower than it should be.
+* If its Unicode, R will be 65536 which makes it ~32000x slower for N=2
+
+Observation 2: Huge unmber of smaller subarrays because of recursion.
+
+Solution?
+Cutoff to insertion sort for small subarrays.
+* Insertion sort but start at d-th character.
+* Implement less so that it compares two strings at d-th character
+
+public static void sort(String[] a, int lo, int hi, int d)
+    for (int i = lo; i<= hi; i++)
+        for(int j = i; j > lo && less(a[j], a[j-1], d); j--)
+            exch(a, j, j-1)
+
+private static boolean less(String v, String w, int d)
+    return v.substring(d).compareTo(w.substring(d)) < 0;
+
+MSD String sort: performance
+* MSD examines just enough characters to sort hte keys.
+* Number of characters examined depends on keys
+* Can be sublinear in input size.
+
+If it reaches an index d where all items at d are different, the algorithm will terminate.
+Worst case is if there are lots of duplicates so it will examine all of the characters.
+
+Guarantees 2 * N * W performance where W is the length of the longest item in array and N is number of items in array.
+
+If array entries are random, on average it will complete in N log_r N
+
+It uses N + D*R extra space where D is the stack depth or the length of the longest prefix match.
+
+
+Disadvantages of MSD vs quicksort
+    * Access memory "randomly" when counting keys (cache inefficient)
+    * Inner loop has a lot of instructions.
+    * Extra space for count[]
+    * Extra space for aux[]
+
+Disadvantages of quicksort
+    * Linearithmic number of string compares.
+    * Has to rescan many characters in keys with long prefix matches.
+
+3-Way Radix Quicksort
+
+Overview. Do 3-way partitioning on the d-th character.
+    * Less overhead than R-way partitioning in MSD string sort.
+    * Does not re-examine characters equal to the partitioning char.
+
+public class 3WayRadixQS
+
+    public static void sort(String[] a)
+        sort(a, 0, a.length-1, 0);
+
+    private static void sort(String[] a, int lo, int hi, int d)
+        if (hi <= lo) return
+        int lt = lo
+        int gt = hi
+        int v = charAt(a[lo], d) // picking the partition character
+        int i = lo + 1;
+        while(i <= gt)
+            int t = charAt(a[i], d);
+            if (t < v) exch(a, lt++, i++);
+            else if (t > v) exch(a, i, gt--);
+            else i++;
+        sort(a, lo, lt-1, d); // sort the subarray smaller than pivot
+        if (v >= 0) sort(a, lt, gt, d+1); // sort the middle array
+        sort (a, gt+1, hi, d); // sor the subarray greater than pivot.
+
+Standard quicksort
+    * uses 2N ln N string compares on average.
+    * Costly for keys with long common prefixes.
+
+3-way string (radix) quicksort
+    * Uses 2N ln N character compares on average.
+    * Avoids re-comparing long common prefixes.
+    * Cache friendly since it does not copy back and forth between arrays and is in-place.
+Problem is that its not stable.
+
+Keyword-in-context search
+
+Preprocess: suffix sort the text.
+Query: binary search for query; scan until mismatch.
+
+Longested repeated substring.
+Given a string of N characters, find the longest repeated substring.
+
+1. from the input string, form the suffix array.
+2. sort suffixes to bring repeated substrings together.
+3. From there you can find the longest repeated substring.
+
+
+public String lrs(String s)
+    int N = s.length();
+    String[] suffixes = new String[N];
+    for (int i = 0; i < N; i ++)
+        suffixes[i] = s.substring(i, N);
+
+    String lrs = "";
+    3WayRadixQS.sort(suffixes); // sort the suffixes
+    for (int i = 0; i < N-1; i++)
+        int len = longestCommonPrefix(suffixes[i], suffixes[i+1])
+        if (len > lrs.length)
+            lrs = suffixes[i].substring(0, len);
+    return lrs;
+
+Problem: if the length of the Longest Repeast LRS is really long like 10 million, suffix sort will not work.
+

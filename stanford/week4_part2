@@ -26,22 +26,33 @@ public class BST
         if n == null return 0
         return x.count
 
+    // Insert new node with key, val or replace existing node with key
     public void put(Key key, Value val) {
         root = put(root, key, val)
     }
 
     private Node put(Node x, Key key, Key val)
-        if x == null return new Node(key, val, 1)
+        if x == null return new Node(key, val, 1) // we have found the place we need to put the new node.
+
+        // if the key want to insert is greater than current node's key
+        // we insert it to the right
         if key > x.val
             x.right = put(x.right, key, val)
 
+        // if the key we want to insert is less than current node's key
+        // we insert it to the left
         else if key < x.val
             x.left = put(x.left, key, val)
+
+        // if they are equal then replace the nodes val with the new val.
         else
-            x.val = key
+            x.val = val
+
+        // recompute the size of the thing. Should recursively compute back up.
         x.size = 1 + size(x.left) + size(x.right)
         return x
 
+    // Get the value back
     public Value get(Key key)
         val currentNode = root;
         while (currentNode != null)
@@ -53,12 +64,13 @@ public class BST
                 return currentNode.val
         return null
 
+    // Find node with largest key that is smaller than the given key.
     public Node floor(Key key)
         floor(root, key)
 
     private Node floor(Node n, Key key)
-        if n == null return null
-        if n.key == key
+        if n == null return null // current search path did not find a node smaller than Key
+        if n.key == key // we have found the key
             return n
         if key < n.key
             return floor(n.left, key)
@@ -69,15 +81,20 @@ public class BST
             else
                 return potentialRight
 
+    // Find number of keys less than or equal to given k
     public int rank(Key k)
         rank(root, k)
 
     private int rank(Node n, Key k)
         if k == n.key
+            // if current nodes key is equal, then return the size of tree at this node.
             return size(n)
         else if k < n.key
+            // if current node's key is smaller, then the rank is the size of the left subtree.
             return rank(n.left, k)
         else
+            // if current node's key is greater than the key, then
+            // the rank is all of the current node's left tree + current node + rank of right node.
             return 1 + size(n.left) + rank(n.right, k)
 
     public Node min(Node n)
@@ -86,11 +103,18 @@ public class BST
             temp = temp.left
         return temp
 
+    // Delete's the tree's smallest key
     public Node deleteMin(Node n)
         if n.left == null
+            // if we reach a point where theres no more left child nodes, we are at the bottom
+            // we return the current node's right child to replace it.
             return x.right
         else
+            // recursively go down the left path until we find the smallest node.
+            // the second smallest node's left child will be the smallest node's right child.
             x.left = deleteMin(n.left)
+
+            // compute the count.
             x.count = 1 + size(x.left) + size(x.right)
             return x
 
@@ -98,17 +122,28 @@ public class BST
         delete(root, k)
 
     private Node delete(Node n, Key k)
+        // did not find node to delete
         if n == null return null
+
         if (k == n.key)
+            // we have found the node to delete
             if n.left == null
+                // if theres no left child at this node, we return the right child up.
                 return n.right
             else if n.right == null
+                // if theres no right child at this node, we return the left child up.
                 return n.left
             else
-                Node replacement = min(n.right)
-                replacement.right = deleteMin(n.right)
-                replacement.left = n.left
-                n = replacement
+                // we have both a left child and a right child.
+                // the one item we want to replace is the smallest item in the right subtree.
+                // that item guarantees that it's larger than all of toBeDelete's left children
+                // and that it's smaller than all of toBeDelete's right children
+
+                Node replacement = min(n.right) // find the replacement node.
+                replacement.right = deleteMin(n.right) // set the replacement right child to toBeDelete's right child and also delete it.
+
+                replacement.left = n.left // set the replacement left child to toBeDelete's left.
+                n = replacement // replace current node with replacement and pass it up.
         else if (k < n.key)
             n.left = delete(n.left, k)
         else

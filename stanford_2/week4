@@ -1,0 +1,220 @@
+Tries
+
+Searching with String Keys.
+
+Red-Black Bst
+* search: log n
+* insert: log n
+* delete log n
+* ordered operations: yes
+
+Hash tabls
+* search: 1
+* insert: 1
+* delete: 1
+* ordered operations: no
+
+Goal: Faster than hashing and more flexible than BST
+
+R-Way Tries
+* Store characters in nodes (not keys)
+* Each node has R children, where R is the radix, one for each possible characters.
+* Store values in nodes corresponding to last character in keys.
+
+Search
+Search hit: node where search ends has a non-null value
+Search miss: reaches either a null link or node where search ends has null value.
+
+Insertion
+Follow links corresponding to each character in key we are trying to insert.
+* Encounters a null link: create a new node
+* Encounters the last character of the key: set value in that node.
+
+private static class Node
+    private Object value // value has to be object because arrays cannot have generics
+    private Node[] next = new Node[R]
+
+public class TrieST<Value>
+    private static final int R = 256
+    private Node root = new Node()
+
+    public void put(String key, Value val)
+        root = put(root, key, val, 0)
+
+    private Node put(Node x, String key, Value val, int d)
+        if (x == null)
+            x = new Node()
+        if (d == key.length())
+            x.val = val
+            return x
+        char c = key.charAt(d)
+        x.next[c] = put(x.next[c], key, val, d+1);
+        return x;
+
+    public Value get(String key)
+        Node x = get(root, key, 0)
+        if (x == null) return null;
+        return (Value) x.val;
+
+    private Node get(Node x, String key, int d)
+        if (x == null)
+            return null;
+        if (d == key.length())
+            return x;
+        char c = key.charAt(d)
+        return get(x.next[c], key, d+1);
+
+    private void delete(String key)
+        delete(root, key, 0)
+
+    private Node delete(Node x, String key, int d)
+        if (x == null)
+            return null
+        if (d == key.length())
+            x.val == null;
+            return deleteIfNecessary(x)
+        char c = key.charAt(d)
+        x.next[c] = delete(x.next[c], key, d+1)
+        return deleteIfNecessary(x)
+
+    private Node deleteIfNecessary(Node x)
+        if (!hasAnymoreLinks(x.next) && x.val == null)
+            return null;
+        else
+            return x
+
+Trie performance
+* Search hit: Need to examine all L characters for equality. (Linear)
+* Search miss: Could have mismatch on first character or examine a few characters and miss. (Sublinear)
+
+Space: R null links at each leaf potentially.
+(But sublinear space possible if many short strings share common prefixes)
+Fast search but wastes space.
+
+How to delete?
+* Find the node corresponding to key and set the value to null.
+* If that node has all null links and null value, remove that node and recursive delete it up.
+
+Challenges. Use less memory. If we use Unicode chars, we need 65,536-way trie.
+
+Ternary Search Tries
+* Store characters and values in nodes
+* Each node has 3 children: smaller(left), equal(middle), larger(right)
+
+Search in Ternary Search Trie
+1. Follow links corresponding to each character in the key
+    * if less, take left link, if greater, take right link.
+    * if equal, take the middle link and move to next key character.
+
+Search hit: node where search ends has a non-null value
+Search miss. Reach a null link or node where search ends and node has null value.
+
+Insert in Ternary Search Trie
+Follow links corresponding to each character in key we are trying to insert.
+    * if less, insert char in left link. if greater, insert in right link.
+    * if equal, take the middle link and move to next character.
+    * When at the last char in key, add value.
+
+private class Node
+    private Value val;
+    private char c;
+    private Node left, mid, right;
+
+public TernaryTrie
+    private Node root
+
+    public void put(String key, Value key)
+        root = put(root, key, val, 0);
+
+    private Node put(Node x, String key, Value val, int d);
+        char c = key.charAt(d);
+        if (x == null)
+            x = new Node();
+            x.c = c;
+        if c < x.c
+            x.left = put(x.left, key, val, d);
+        else if c > x.c
+            x.right = put (x.right, key, val, d);
+        else if (d < keys.length - 1)
+            x.mid = put(x.mid, key, val, d + 1);
+        else
+            x.val = val;
+        return x;
+
+    public Value get(String key)
+        Node x = get(root, key, 0)
+        if x != null
+            return x.val
+        else
+            return null;
+
+    private Node get(Node x, String key, int d)
+        char c = key.charAt(d);
+        if (x == null)
+            return null;
+        if c < x.c
+            return get(x.left, key, d)
+        else if c > x.c
+            return get(x.right, key, d)
+        else if (d < keys.length - 1)
+            return get(x.mid, key, d + 1);
+        else
+            return x;
+
+TST is as fast as hashing for string keys and space efficient.
+* works only for Strings or digital keys
+* Only examines just enough key characters
+* Search miss may only involve a few characters.
+* Supports ordered symbol table operations.
+
+Character-Based Operations
+
+Prefix match
+* Get all keys that starts with prefix.
+
+Wild card match
+* Search for '.he' would return she and the
+
+Longest Prefix
+* Key that is the longest prefix of key.
+* Longest prefix of "shellsort" is shells if shells is in our TST
+
+Iterable<String> keys() // give all keys in this trie
+    Queue<String> queue = new Queue<String>();
+    collect(root, "", queue);
+    return queue;
+
+private void collect(node x, String prefix, Queue<String> q)
+    if (x == null) return;
+    String currentPrefix = prefix + x.c;
+    if (x.left != null) collect(x.left, currentPrefix, q)
+    if (x.val != null) q.enqueue(currentPrefix)
+    if (x.mid != null) collect(x.mid, currentPrefix, q)
+    if (x.right != null) collect(x.mid, currentPrefix, q)
+
+Iterable<String> keysWithPrefix(String s) // return all keys that have s as prefix
+    Queue<String> queue = new Queue<String>()
+    Node x = get(root, prefix, 0); // same get as above;
+    collect(x, prefix, queue);
+    return queue;
+
+Iterable<String> keysThatMatch(String s) // keys that match s where "." is a wildcard
+
+String longestPrefixOf(String s) // longest key that is a prefix of s.
+    int length = search(root, query, 0, 0);
+    return query.substring(0, length)
+
+private int search(Node x, String query, int d, int length)
+    if (x == null) return length;
+    if (x.val != null) length = d;
+    if (d == query.length) return length;
+    char c = query.charAt(d);
+    if (c < x.c) return search(x.left, query, d, length)
+    else if (c > x.c) return search(x.right, query, d, length)
+    else return search(x.mid, query, d+1, length)
+
+Can also implement things like floor and rank
+
+Patricia Trie
+* Remove one-way branching
+* Each node represents a sequence of characters

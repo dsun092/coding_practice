@@ -1,0 +1,169 @@
+Short paths in a Edge-Weighted Digraph
+
+Shortest paths variants
+Which vertices?
+1. Source-sink: from one vertex to another
+2. Single source: from one vertex to every other vertex
+3. All pairs: between all pairs of vertices
+
+Restrictions on edge weights?
+1. Nonnegative weights
+2. Arbitrary weights
+3. Euclidean weights
+
+API
+
+public class DirectedEdge
+    private int v
+    private int w
+    pritave double weight
+
+    DirectedEdge(int v, int w, double weight)
+        this.v = v
+        this.w = w
+        this.weight = weight
+
+    int from()
+        return v
+
+    int to()
+        return w
+
+    double weight()
+        return weight
+
+public class WeightedDigraph
+    Array<List<DirectedEdge>> graph
+
+    WeightDigraph(int V)
+        graph = new Array<List<DirectedEdge>>(V)
+        for i until V
+            graph[i] = new List<DirectedEdge>();
+
+    void addEdge(DirectedEdge e)
+        graph[e.from()].add(e)
+
+    Iterable<DirectedEdge> adj(int v) // edges coming out of v
+        return graph[e.from()]
+
+    int V() // number of vertices
+
+public class SP
+    double[] distTo; // where distTo[v] is shortest known path from s to v
+    Array<DirectEdge> edgeTo; // where edgeTo[w] is the last edge on shortest known path from s to w
+
+    SP(WeightedDigraph g, int s) // where s is the source
+        edgeTo = new Array<DirectEdge>(g.V)
+        distTo = new double[g.V]
+        pq = new IndexMinPQ<Double>(g.V)
+
+        for (int v = 0; v < g.V; v++)
+            distTo[v] = INF;
+        distTo[s] = 0.0;
+
+        pq.insert(s, 0.0)
+        while (!pq.isEmpty())
+            int v = pq.delMin
+            for (DirectedEdge e : g.adj(v))
+                relax(e)
+
+    // We want to check if we should add this edge to our shortest paths
+    // We check if the current distance to the end point of the edge we want to
+    // is greater than the distance to the start of the edge + the weight of the edge.
+    private void relax(DirectEdge e)
+        int v = e.from
+        int w = e.to
+
+        if(distTo[w] > distTo[v] + e.weight)
+            distTo[w] = distTo[v] + e.weight
+            edgeTo[w] = e
+            if (pq.contains(w)) pq.decreaseKey(w, distTo[w]))
+            else pq.insert(w, distTo[w])
+
+    double disTo(int v)  // length of shortest path from s to v
+        return distTo[v]
+
+    Iterable<DirectEdge> pathTo(int v) shortest path from s to vertices
+        Stack<DirectEdge> stack;
+        for(DirectEdge e = edgeTo[v]; e != null; e = edgeTo[e.from])
+            stack.push(e)
+        return stack;
+
+Acyclic shortest paths
+1. consider the vertices in topological order.
+2. go through each vertices and relax all the edges coming out of the vertex.
+
+Why does this work?
+1. Running DFS to perform topological sort takes at most V steps.
+2. Each edge is relaxed exactly once because when we visit a new vertex in the tree, we relax all the edges and all the vertices in a way that fullfils this criteria:
+    distTo[w] <= distTo[v] + e.weight. <- either it was already lower in weight or we made distTo[w] = distTo[v] + e.weight
+
+public class AcyclicSP
+    private DirectEdge[] edgeTo
+    private double[] distTo
+
+    public AcyclicSP(WeightedDigraph G, int s)
+        edgeTo = new DirectEdge[G.V()]
+        distTo = new double[G.V()]
+
+        for (int v = 0; v < G.V(); v++)
+            distTo[v] = INF
+        distTo[s] = 0.0
+
+        Topological sorted = new Topological(G)
+        for(int v : topological.order())
+            for (DirectedEdge e : G.adj(v))
+                relax(e)
+
+    private void relax(DirectEdge e)
+        int v = e.from
+        int w = e.to
+
+        if(distTo[w] > distTo[v] + e.weight)
+            distTo[w] = distTo[v] + e.weight
+            edgeTo[w] = e
+
+Given a list of jobs where each job has dependencies on other jobs,
+how do you schedule jobs such that all the jobs can be completed in the shortest time? Try to reuse and minimize number of workers.
+
+Intuition 1:
+1. A job cannot start until all of its dependencies are finished. Therefore the earliest time a job can start is the time when it's last dependency is complete. Therefore lets say the time for one of its dependencies to complete is d1 and it has N dependencies the start time of this job will be the max(d1, d2 .... dn)
+
+Intuition 2:
+To get the longest path in the graph, if you convert each edge weight to negative then run shortest path and you then negate the weights on each edge again, you would get a longest path graph. You can also just reverse the logic in reverse.
+
+Intuition 3:
+1. Each "job" has 2 vertices (begin and end)
+2. Three edges for each job
+    i. begin to end (weighted by duration)
+    ii. source to begin (0 weight)
+    iii. end to sink (0 weight)
+
+The weight of the longest path from source to a job is the earliest that the job can begin.
+
+
+Simplest shortest path problem.
+1. no directed cycles
+    i. use topological sort and process each edge once.
+
+2. no negative weights
+    i. djikstras algorithm
+
+3. no negative cycles
+
+
+Summary of the algorithms
+Djikstra's Algorithm
+1. nearly linear-time processing when weights are non-negative
+2. generalizations encompasses DFS, BFS, and Prim's
+
+Topological Sort
+1. usefuly when there are no direct cycles.
+2. can handle negative weights
+3. faster than djikstra's algorithm
+
+Bellman-ford
+1. can work with negative weights and cycles.
+2. if there are negative cycles, can detect negative cycles.
+3. if no negative cycles, can find shortest path.
+

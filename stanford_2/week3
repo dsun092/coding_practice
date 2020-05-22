@@ -1,0 +1,162 @@
+Min Cut problem
+
+Input: an edge weighted digraph. Assume all the edge weights as positive. We specify a source and target vertex. Each edge weight is like a capacity.
+
+Def: a st-cut is a partition of the vertices into two disjoint sets with s in one set A and t in other set B
+
+Def: it's capacity is the sum of capacities of the edges from A to B. Do not count from B to A
+
+Min Cut: Find a cut where the capacity between A to B is minimized.
+
+Max Flow problem
+
+Input: same as above
+
+Def: an st-flow is an assignment of values to the edges such that the flows are positive and cannot be greater than the edge's capacity
+
+Max flow: find the maximum flow that comes out of the target.
+
+For-Fulkerson Algorithm
+1. start with 0 flow.
+2. find an undirected path from s to t such that:
+    i. can increase flow on forward edges (as long as flow is not full)
+    ii. can decrease flow on backward edge (as long as flow is not empty)
+3. algorithm terminates when all paths from s to t contains a full foward edge or empty backward edge.
+
+Another way to word it:
+1. start with 0 flow
+2. while there exists an augmenting path:
+    i. find the augmenting path
+    ii. compute the bottleneck capactiy
+    iii. increase flow on that path by bottleneck capacity.
+
+How to compute a mincut?
+How to find an augmenting path?
+If FF terminates does it always compute a maxflow?
+Does FF always terminate? if so after how many augmentations?
+
+Maxflow-Mincut Theorem.
+
+The net flow across a cut (A, B)  is the sum of the flows on its edges from A to B minus the sum of the flows on its edges from B to A.
+
+Flow-value lemma. Let f be any flow and let (A B) be any cut. Then the net flow across (A,B) equals the value of f.
+
+Augmenting path theorem: a flow is a maxflow if and only if theres no augmenting paths.
+Maxflow-mincut theorem: Value of a maxflow = capacity of the mincut.
+
+How to choose augmenting paths?
+
+1. always choose shortest paths (BFS)
+2. always choose fattest path (priority queue)
+3. random path (randomized queue)
+4. DFS path (DFS)
+
+How to represent this graph?
+Flow edge data type. Associate with each edge the flow and capacity.
+
+Flow network data type: Need to process edge in either direction.
+Include e in both v and w's adjacency list.
+
+Residual Capacity.
+    Forward edge: residual capacity = capacity - flow
+    Backward edge: residual capacity = flow
+
+Augment flow
+    forward edge: add delta
+    backward edge: subtract delta
+
+
+public class FlowEdge
+    int v
+    int w
+    double capacity
+    double flow
+
+    FlowEdge(int v, int w, double capacity)
+        v = v
+        w = w
+        capacity = capacity
+
+    int from()
+        return v
+
+    int to()
+        return w
+
+    int other(int vertex)
+        if v == vertex return w else return v
+
+    double capacity
+        return capacity
+
+    double flow
+        return flow
+
+    double residualCapacityTo(int vertex)
+        if (v == vertex) return flow // backward edge
+        else return capacity - flow // forward edge
+
+    void addResidualFlowTo(int vertex, double delta)
+        if (v == vertex) flow -= delta // backward edge
+        else flow += delta // forward edge
+
+public class FlowNetwork
+    private final int V
+    private FlowEdge[][] adj; // array of FlowEdge array
+
+    FlowNetwork(int V)
+        this.V = v
+        adj = new Bag[V]
+        for (int v = 0; v < V; v++)
+            adj[v] = new FlowEdge[]
+
+    void addEdge(FlowEdge e)
+        int v = e.from
+        int w = e.to
+        adj[v].add(e)
+        adj[w].add(e)
+
+    Iterable<FlowEdge> adj(int v)
+        return adj[v]
+
+public class FordFulkerson
+    private boolean[] marked // true if s->v path in residual network
+    private FlowEdge[] edgeTo // last edge on s->v path
+    private double value // value of the flow
+
+    public FordFulkerson(FlowNetwork G, int s, int t)
+        value = 0.0
+        while (hasAugmentingPath(G, s, t))
+            double bottle = INF
+            for (int v = t; v != s; v = edgeTo[v].other(v))
+                bottle = Math.min(bottle, edgeTo[v].residualCapacityTo(v))
+
+            for (int v = t; v != s; v = edgeTo[v].other(v))
+                edgeTo[v].addResidualFlowTo(v, bottle)
+
+            value += bottle
+
+    // Using BFS
+    // Can also use other alternatives to compute this path.
+    private boolean hasAugmentingPath(FlowNetwork G, int s, int t)
+        edgeTo = new FlowEdge[G.V]
+        marked = new boolean[G.V]
+
+        Queue q = new Queue
+        q.enqueue(s)
+        marked[s] = true
+        while (!q.isEmpty())
+            int v = q.dequeue()
+            for (FlowEdge e : G.adj(v))
+                int w = e.other(v)
+                if (e.residualCapacitiyTo(w) > 0 && !marked[w])
+                    edgeTo[w] = e
+                    marked[w] = true
+                    q.enqueue(w)
+
+        return marked[t]
+
+    public double value
+
+    publc boolean inCut(int v)
+        return marked[v]

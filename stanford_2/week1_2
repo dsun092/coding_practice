@@ -1,0 +1,70 @@
+Directed Graphs (Digraph)
+
+public class Digraph
+
+    Digraph(int V)
+
+    void addEdge(int v, int w)
+
+    Iterable<Integer> adj(int v)
+
+    int V()
+
+    int E()
+
+    Digraph reverse()
+
+Topological Sort
+How to redraw the Directed Acyclic graph such that all the edges point upwards.
+
+Solution:
+DFS
+
+1. run dfs
+2. return vertices in reverse post-order.
+
+topologicalSort(Graph g)
+    vertex[] marked // keep track of which vertices we traversed
+    stack[] stack // keep track of topological order.
+    hasCycle = false
+
+    for vertex in g.vertices():
+        dfs(vertex, marked, stack, hasCycle)
+
+    vertex[] ordered
+    while !stack.isEmpty():
+        ordered.append(stack.pop())
+
+dfs(vertex v, marked, stack):
+    if marked[v] == false:
+        for neighbor in v.neighbors:
+            dfs(neighbor, marked, stack)
+        if (marked[v] == false)
+            marked[v] = true
+        else:
+            hasCycle = true
+        stack.push(v)
+
+Topological Sort does not work if Digraph has a cycle.
+How to detect cycles in a Digraph?
+1. dfs
+
+Strongly Connect Components
+two vertices v and w are strongly connected if there is a direct path from v to w AND
+there is a direct path from w to v.
+
+how to detect strongly connect components?
+1. compute reverse postorder in G-reverse. Use first DFS to generate this reverse graph.
+
+2. then run DFS in the reverse graph.
+3. similar to connect components, we maintain a list of "cluster ids"
+
+
+How to reverse a direct graph?
+
+graph = some {}
+reverseGraph = {}
+
+for vertex in graph:
+    for neighbor in vertix.neighbors:
+        reverseGraph.addEdge(neighbor, vertex)

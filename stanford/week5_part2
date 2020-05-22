@@ -18,6 +18,9 @@ For now let's say we just are in a one dimensional space. We can use our symbol 
 
 Assuming we have BTS that keeps track of size.
 
+// imagine if this was on an array. The number of items between index lo and hi is simply hi - lo.
+// putting this in a tree, the number of items between low and high is rank(high) - rank(low)
+// where we define rank to be number of items less than key.
 def rangeCount(Key low, Key high)
     if (contains(high))
         return rank(high) - rank(low) + 1
@@ -45,7 +48,7 @@ Given N horizontal and vertical line segments, find all the intersections
 Sweep line algorithm
 Think of a vertical line that sweeps from left to right through the data.
 
-Every time the line hits a line, we gotta do something.
+Every time the vertical line hits a horitonzal line, we gotta do something.
 
 1. When we hit the left point of a horizontal line, we add the Y value it to a BST
 2. When we hit the right coordinate of a horizontal line, we remove the Y value for that line from BST
@@ -89,8 +92,53 @@ How do we make a partition plane?
     Everything to left of point is below it on space
     Everything to right of point is above it in space
 
-Interval Search
+KD Tree: Find all points within rectangle range
 
+2d range search.
+def rangeSearch(Rectangle rec)
+    Node[] result = []
+    level = 1
+    boundedTraversal(root, rec, result, level)
+
+def boundedTraversal(Node n, Rectangle rec, Node[] result, int level)
+    if n == null
+        return
+    if rec.contains(n.key)
+        result.append(n)
+    if level % 2 == 1 // we are at a current odd level which means we are at a vertical split.
+        // thus we need to compare the X range of rectangle.
+        if rec.isLeftOf(n.xPosition) // rectangle is completely on left partition
+            boundedTraversal(Node n.left, Rectangle rec, Node[] result, level + 1)
+        else if rec.isRightOf(n.xPosition) // rectangle is completely on right partition
+            boundedTraversal(Node n.right, Rectangle rec, Node[] result, level + 1)
+        else // rectangle intersects the current partition so we need to check both left and right
+            boundedTraversal(Node n.left, Rectangle rec, Node[] result, level + 1)
+            boundedTraversal(Node n.right, Rectangle rec, Node[] result, level + 1)
+    else // we are at a current even level which means we are at a horizontal split.
+        // thus we need to compare the Y range of rectangle.
+        if rec.isBelow(n.yPosition) // rectangle is completely on left partition
+            boundedTraversal(Node n.left, Rectangle rec, Node[] result, level + 1)
+
+        else if rec.isAbove(n.yPosition) // rectangle is completely on right partition
+            boundedTraversal(Node n.right, Rectangle rec, Node[] result, level + 1)
+
+        else // rectangle intersects the current partition so we need to check both left and right
+            boundedTraversal(Node n.left, Rectangle rec, Node[] result, level + 1)
+            boundedTraversal(Node n.right, Rectangle rec, Node[] result, level + 1)
+
+KD Tree: Find nearest point
+1. Compare current point's distance to node. If distance if smaller than previously found, set new distance as best distance.
+2. We move towards to point.
+    a. if we are at a vertical split
+        i. we go to the left of the tree if point is left first
+        ii if the smallest distance found on the left of the tree is smaller than the smallest posssible distance found on right of the tree, we do not go right.
+        iii if the smallest distance found on left of the tree is not smaller than smallest possible distance found on right of the tree, we go to the right of the tree
+    b. if we are at a horizontal split
+        i. we go to the left of the tree if point is left below
+        ii if the smallest distance found on the left of the tree is smaller than the smallest posssible distance found on right of the tree, we do not go right.
+        iii if the smallest distance found on left of the tree is not smaller than smallest possible distance found on right of the tree, we go to the right of the tree
+
+Interval Search
 1d interval search. Data structure to hold set of overlapping intervals
 
 API Operations:

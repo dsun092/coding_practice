@@ -28,7 +28,7 @@ public class Heap
     3. If item at k is smaller than the larger child, we swap it.
     4. Repeat until k is bigger than both children or until we hit the end.
     private void sink(int k)
-        while (2k < currentEnd)
+        while (2k < currentEnd) // left child is at 2k
             int j = 2k
             if (j < currentEnd && arr[j] < arr[j+1])
                 j++

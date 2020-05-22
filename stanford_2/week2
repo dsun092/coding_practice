@@ -1,0 +1,158 @@
+Minimum Spanning Trees
+Definition:
+Given a undirected graph G with positive edge weights (connected),
+A spanning tree of G is a subgraph T that is both a tree (connected and acyclic) and spanning (includes all of the vertices).
+
+Cut Property
+Defition:
+A cut in a graph is a partition of its vertices in to two nonempty sets.
+
+Crossing Edge
+Definition:
+A crossing edge connects a vertex in one set with a vertex in the other.
+
+Given any cut, the crossing edge of minimum weight is in the MST.
+
+Given a graph, we say that an edge is black if its in MST and white if its not.
+Keep cutting the graph such that there is not a crossing black edge between two cuts.
+    1. the smallest edge in the cut should be marked black and is in the MST.
+Keep processing until there is no more cut.
+
+Weighted Edge Api
+
+public class Edge implements Comparable<Edge>
+    private int v, w;
+    private double weight;
+
+    Edge(int v, int w, double weight)
+
+    int either() // either endpoint
+        return v
+
+    int other(int vertex) // get the other endpoint in the edge
+        if vertex == v return w
+        else return v
+
+    int compareTo(Edge that) // compare edge to that edge
+        if this.weight < that.weight return -1
+        else if this.weight > that.weight return 1
+        else return 0
+
+    double weight() // weight of this edge
+
+    String toString()
+
+public class WeightedGraph
+    private final int V;
+    private final List<Edge>[] adj;
+
+    WeightedGraph(int V)
+
+    void addEdge(Edge e)
+        int v = e.either(), w = e.other(v);
+        adj[v].add(e)
+        adj[w].add(e)
+
+    Iterable<Edge> adj(int v) // give all edges adjacent to this vertex
+        return adj[v]
+
+    Iterable<Edge> edges() // all edges in this graph
+
+
+Kruskal's Algorithm
+1. sort the edges by weight.
+2. add the edge the tree unless the edge creates a cycle.
+3. we have a MST if we have V-1 edges.
+
+How to detect if we have a cycle?
+use union-find data structure.
+
+How to sort the edges by order?
+1. use a priority queue
+
+public class KruskalMst
+    private Queue<Edge> mst = new Queue<Edge>();
+
+    public KruskalMST(WeightedGraph g)
+        MinPQ<Edge> pq = new MinPQ<Edge>()
+        for edge in g.edges()
+            pq.insert(e)
+
+        UnionFind uf = new UF()
+        while (!pq.isEmpty() && mst.size() < g.V() - 1)
+            Edge e = pq.delMin
+            int v = e.either, w = e.other(v)
+            if (!uf.connected(v, w))
+                uf.union(v, w)
+                mst.queue(e)
+
+Prim's Algorithm
+1. start at vertex 0 and greedily grow tree T.
+2. Add to T the min weight edge with exactly one endpoint in T.
+3. Repeat until V-1
+
+How to find min weight edge with exactly one point in T?
+1. use a priority queue <- log E
+
+This is a lazy implementation
+1. maintain a PQ of edges with (at least) one endpoint in T
+    a. Key = edge; priority = weight of edge
+    b. delete-min to determine next edge to add to T
+    c. If both vertex are already in T, then disregard vertex
+
+public class PrimMST
+    // Lazy implementation
+    private Queue<Edge> mst;
+    private boolean[] marked;
+    private MinPQ<Edge> pq;
+
+    public PrimMST(WeightedGraph g)
+
+        visit(g, 0)
+        while (!pq.isEmpty())
+            Edge e = pq.delMin
+            int v = e.either, w = e.other(v)
+            if (marked[v] && marked[w]) continue
+            mst.enqueue(e)
+            if (!marked[v]) visit(g, v)
+            if (!marked[w]) visit(g, w)
+
+    private visit(Graph g, int v)
+        marked[v] == true
+        for edge in g.adj(v):
+            if (!marked[e.other(v)]])
+                pq.insert(edge)
+
+
+Prim's Algorithm Eager
+    1. maintain a PQ of vertices connected by an edge to T, where the priority of vertex is the shortest edge connecting v to T.
+
+
+Index Based Priority Queue.
+Need 3 parallel arrays to keep track.
+
+PQ
+this is contains the actual priority index
+
+QP
+this is a reverse mapping of priority index
+
+Keys
+this is a mapping of the priority index of a given key.
+
+PQ[1] such that the item in Keys[PQ[1]] is of the highest priority
+
+QP[0] such that the item in PQ[QP[0]] is the index of the highest priority in Key
+    QP[i] says that for a given Key[i], its position on the PQ is PQ[QP[i]]
+
+Key[i] is the value of the key associated with priority index at QP[i]
+
+so if i say given a vertex with v, it exist in the priority queue if QP[v] != -1
+
+
+How does lazy vs eager algorithm differ?
+
+Lazy implementation of prim's algorithm pushes all the edges onto the priority queue which means if an edge to W is added and at a later time, a better path to W is added then the previous edge will remain on the queue.
+
+Eager implementation of prim's algorithm will process each vertices at most once in the queue because if it processes a vertex that it has already seen previously, it will update the item in the PQ if it is able to.
+

@@ -1,8 +1,8 @@
 Balanced Search Trees
 
 enum Color {
-    RED;
-    BLACK;
+    RED; // represents a 3-node
+    BLACK; // represents a 2-node
 }
 
 public class Node {
@@ -39,20 +39,24 @@ public class BST
         if x == null return false
         return x.color == RED
 
+    // we replace current node with current node's right child.
+    // we put current node as new current's left child.
     private rotateLeft(Node x)
-        Node r = x.right
-        x.right = r.left
-        r.left  = x
-        r.color = x.color
-        x.color = RED
+        Node r = x.right // grab the right child.
+        x.right = r.left // set right child of current node to new current's left.
+        r.left  = x // set new current's left to old current.
+        r.color = x.color // set new current's color to old current's color.
+        x.color = RED // set old current's color to red.
         return r
 
+    // we replace current node with current node's left child
+    // we put current node as new current's right child.
     private rotateRight(Node x)
-        Node l = x.left
-        x.left = l.right
-        l.right = x
-        l.color = x.color
-        x.color = RED
+        Node l = x.left // grab the left child
+        x.left = l.right // set left child of current node to new current's right.
+        l.right = x // set new current node's right child to old current node.
+        l.color = x.color // set new current node's color to old current node's color
+        x.color = RED // set old current's color to RED.
         return l
 
     private colorFlip(Node x)
@@ -62,16 +66,27 @@ public class BST
             x.color = RED
 
     private Node put(Node x, Key key, Key val)
-        if x == null return new Node(key, val, 1, RED)
+        if x == null return new Node(key, val, 1, RED) // found the place we want to insert. put a RED node.
         if key > x.val
+            // if key is greater than current nodes key,
+            // put the key,val somewhere in the right tree.
             x.right = put(x.right, key, val)
         else if key < x.val
+            // if key is smaller than current nodes key,
+            // put the key,val somewhere in the left tree.
             x.left = put(x.left, key, val)
         else
-            x.val = key
+            // update the val
+            x.val = val
 
-        if (isRed(x.right) && isRed(x.right)) x = rotateLeft(x)
+        // if right child is red and left child is not red, we want to rotateLeft since current node is right leaning.
+        if (isRed(x.right) && !isRed(x.left)) x = rotateLeft(x)
+
+        // if the left child is RED and left grand child is RED, it means we are at a current 4-node.
+        // when we have a 4 node, we want to rotateRight to balance the 4 node.
         if (isRed(x.left) && isRed(x.left.left)) x = rotateRight(x)
+
+        // split the 4 node
         if (isRed(x.left) && isRed(x.right)) flipColors(x)
 
         x.size = 1 + size(x.left) + size(x.right)

@@ -1,0 +1,91 @@
+IndexMinPQ
+    int limit
+    int n
+
+    Key[] keys
+    int[] pq
+    int[] qp
+
+
+    public IndexMinPQ(int limit)
+        limit = limit
+        n = 0
+
+        keys = new Keys[limit+1]
+        pq = new pq[limit+1]
+        qp = new qp[limit+1]
+        for (int i = 0; i <= limit; i++)
+            qp[i] = -1 // mark every item as something we have not seen yet
+
+    // have we already processed and item with id i
+    public boolean contains(int i)
+        return qp[i] != -1
+
+    public void insert(int i, Key key)
+        n++
+        qp[i] = n
+        pq[n] = i
+        keys[i] = key
+        swim(n)
+
+    // return the id associated with the minimum key
+    // where a key for a node in a graph would be the distance to that node
+    public void minId()
+        return pq[1]
+
+    // return the minimum key in the pq
+    // this would return the shortest distance
+    public Key minKey
+        return Key[pq[1]]
+
+    // Removes the minimum key and return its associated index
+    public int delMin()
+        int min = pq[1]
+        exchange(1, n)
+        n = n - 1
+        sink(1)
+        qp[min] = -1 // remove it
+        keys[min] = null // remove it
+        pq[n+1] = -1 // remove it
+
+    // Returns the value associated with this id
+    public Key keyOf(int i)
+        return keys[i]
+
+    // decrease the value for this key
+    // assume that the new key is smaller than existing key
+    public void decreaseKey(int i, Key key)
+        Key[i] = key
+        swim(qp[i])
+
+    // increase the value for this key
+    // assume that the new key is larger than existing key
+    public void increaseKey(int i, Key key)
+        Key[i] =. key
+        sink(qp[i])
+
+    // swap the the priority between i and j
+    private void exchange(i, j)
+        int swap = pq[i]
+        pq[i] = pq[j]
+        pq[j] = swap
+        qp[pq[i]] = i
+        qp[pq[j]] = j
+
+    private void swim(int k)
+        while (k > 1 && keys[k/2] > keys[k])
+            exchange(k/2, k)
+            k = k/2
+
+    private void sink(int k)
+        while (2*k <= n)
+            int j = 2*k
+            if (j < n && keys[j+1] > keys[j])
+                j = j+1
+            if (keys[j] < keys[k])
+                exchange(k, j)
+            k = j
+
+
+
+
