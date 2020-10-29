@@ -1,0 +1,115 @@
+Algorithms Psuedo Code
+
+Kruskal's Algorithm
+1. We'll of Queue of edges to represent the edges (can be any collection)
+2. Uses a MinPQ to get edges from smallest to largest
+3. Use UnionFind to check if adding a edge to the MST Queue will create a cycle.
+4. If it does not, connect the vertices in UnionFind and add the edge to the Queue.
+
+Analysis:
+Time to build the MinPQ is E log E
+Time to check if two vertices are connected is log V
+TIme to connect two vertices is log V
+
+total time is ElogE + E (2*logV)
+
+Primm's Algorithm Lazy Implementation
+
+Helper data structures
+1. marked array to keep track of which vertices are in the MST
+2. Queue (list) of edges in the MST that will be returend
+3. MinPQ of edges that connect tree vertices to non-tree vertices.
+
+Algorithm
+1. Mark the first vertex as visited.
+2. Add all the edges from first vertices into MinPQ.
+3. Loop while MinPQ is not empty.
+4. Take the minimum edge from MinPQ
+5. If the other vertex from minimum edge is not visited
+    mark it as visited
+    put the edge into Queue
+    add all edges going out from the other into MinPQ
+
+Analysis:
+For every vertex, we will add all edges to MinPQ
+Worst case all edges will be added to MinPQ, to add a Edge to min PQ it takes log E.
+To remove edge from min PQ it takes log E
+
+If every edge is added and removed, runtime is E log E
+
+Primm's Algorithm Eager Implementation
+Helper data structures
+1. marked array to keep track of which vertices are in MST
+2. Queue (list) of edges in MST that will be returned
+3. MinPQ of vertices. The priority of the vertex is the smallest weight from vertex.
+
+Algorithm
+1. Mark start vertex as visited.
+2. For every neighbor from start vertex, add their neighbor to the MinPQ where the priority is the weight of the crossing edge.
+3. While MinPQ is not empty, perform loop
+4. DeleteMin from PQ which grabs the vertex with smallest crossing edge and add that to MST and mark it as visited.
+5. For all neighbors in that new vertex added, check all of its neighbors
+    1. If neighbor is already in MinPQ, decrease priority based on new edge if necessary
+    2. If neighbor is not in MinPQ, add it based on its priority
+
+
+Djikstra's Algorithm
+Helper data structures
+1. DistTo array to keep track of current shortest distance to given vertex
+2. EdgeTo array to keep track of current edge that goes to a given vertex
+3. MinPQ keep tracking of the nearest Vertex to existing paths.
+
+1. Starting from source, mark DistTo source as 0 and add it to MinPQ
+2. While MinPQ is not empty,
+3. DeleteMin in MinPQ and grab that vertex
+4. For all edges going out of that vertex,
+    1. The shortest path to destination vertex is either the existing path length OR current path length to source vertex + edge weight from source to target vertex.
+    2. If the shorter path is through source vertex, update the DistTo and EdgeTo
+    3. Check if destination vertex is in MinPQ, if it is then decrease the key, if not then add it.
+
+LSD Radix Sort
+
+1. Lets say we have a bunch of things to sort and each item with length W.
+2. Start at n = W-1, going all the way down to 0
+3. Use key-index sort at n.
+    1. Use radix array to hold all combinations of radix (for words this would be like 24 for each letter in alphabet, the order should be in ascending or descending order)
+    2. Go through every item in array and count # of occurences of each radix.
+    3. Go through count array and increment item by previous item value + current item value. For example if count of A is 5 and count of B is 3, the new item in A should be 0, item in B should be 5, and item in C should be 8. This means that A begins at index 0, all Bs begin at index 5, and all Cs begin at index 8.
+    4. Then in Auxiliary array with same size as input array, you know where to place each item according to their current count.
+    5. Move item from original array down into auxiliary array by the count.
+
+
+MSD Radix Sort
+1. Similar idea to LSD except starting from n = 0 to W-1.
+2. Except when you do from left to right sorting, you have to sort within the bounded area rather than entire thing.
+3. Let's say you sort by first letter out of list of 5 letter words. When you sort by second letter, you have to make sure you only sort within the groups within 1st letter. So let's say you sorted and there are 10 words that begin with letter A, when you sort the second letter, you want to recursively sort 0-10 since thats where all the As are.
+
+Risks of MSD
+1. You need a count array for each recursive call because each count is unique within that subset.
+
+Potential benefits of MSD
+1. You only need to examine characters until there are no more duplicates. For example lets say you have 50 items the first character only contains 1,2,3, and 4. So on the first item you sort and you have partitioned items by the first characters such that all the 1s are together, 2s are together, etc. Now let's say within ones, all of the second characters are unique so if you sort by just that second character, you are done with all the 1s. Now lets say 3s and 4s are also all unique but the 2s have mostly unique but one repeated charcter. You are done with 3s and 4s once you sort them and once you sort by the 2s and the subset within twos that have multiple instances you are done.
+
+3-Way Radix Quicksort
+1. Rather than partition by each character, you do a 3 way partition using less than, equal to, and greater than.
+
+Knuth-Morris-Pratt
+
+
+Dynamic Programming:
+1. Define object function
+2. Identify base cases
+3. Identify recurrence relationSMT
+4. Order of computation
+5. location of answer
+
+
+Simple Steps to determine how to design your algorithm
+
+1. How would you solve the problem with brute force.
+2. Can you divide the problem into sub-problems.
+    i. Simply cut problems in half?
+    ii. Partition the data somehow?
+3. Can you re-order the input? Would it be easier if the inputs were ordered?
+    i. In general, ordering costs nlogn so if ordering the inputs can reduce your runtime from quadratic down to linearithmeic, ordering is "free".
+4.

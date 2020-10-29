@@ -1,0 +1,40 @@
+Longest substring without repeating characters
+
+Given a string, find the length of the longest substring without repeating characters.
+
+Solution 1: Sliding window
+
+What we need:
+1. Map that we use to keep track of current characters we've seen.
+2. left and right pointer
+3. pointer to keep track of longest
+
+We loop through every character in string
+1. Put character into map and increment count by 1 for that character.
+2. We get the current count for the character we just added.
+3. While the current count is greater than 1.
+    1. we get the character at current left pointer.
+    2. decrement the count for that character since we'll slide past it.
+    3. increment left by 1.
+    4. if the slideOff character is the same as current character, we can decrement current count by 1.
+5. Increment right pointer by one.
+6. We take longest as Math.max(longest, right-left)
+
+At any point in the loop, we slide the right window by 1 each time. The only time we slide the left window is when we meet a repeated character. If we meet a repeat character, we slide the left window all the way down until that repeated character is popped off our window.
+
+Example:
+abcdec
+
+Our first slide will go all the way to e.
+Once we reach c. we will slide left all the way til d. The size of that sequence is right - left + 1 (6-3) " 3. or len(dec).
+
+
+Solution 2: Sliding window optimized
+
+What we really need is just get the index of the repeated character that we see.
+
+the left window is either where its currently at or we have seen a character, where a repeated character is farther right than the left window.
+
+let's say we are processing:
+abcda
+When we hit the second a, the left window is one past the position of the previous a.

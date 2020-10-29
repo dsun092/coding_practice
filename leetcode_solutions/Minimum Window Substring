@@ -1,0 +1,28 @@
+Minimum Window Substring
+https://leetcode.com/problems/minimum-window-substring/
+
+Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
+
+Solution 1: Sliding window
+We create a map to keep count of all the characters in pattern string.
+We then get the total number of uniqueCharacters as the size of the map.
+
+We keep a left and right pointer.
+We assume result_left is 0 and result_right " end of the string.
+
+Idea is that when we see characters in pattern, we decrement current count by 1 and when we have seen all the totalUniqueCharacters, We slide the left window and for each character that we slide if we see it in our map, we increment the count by 1.
+
+We iterate through each character in the search string
+    1. If current character is one of the characters in pattern
+        1. we decrement the count for that character by 1.
+        2. If the count for that character reaches 0, we decrement totalUniqueCharacters by 1.
+    2. if the totalUniqueCharacters becomes 0 at any time.
+        When this happens we know that all the characters in our map has a count of at most 0. Some may have negative.
+
+        1. get character at current left window.
+        2. if character is one of characters in pattern
+            1. increment the count for that character by 1.
+            2. If the count for that greater becomes greater than 0, we know that at our current left position is the begin to contain all characters in our index.
+            3. If the size of the current window is less than the size of previously found window, we adjust the new window accordingly.
+
+    3. We return the substring between left and right+1;

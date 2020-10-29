@@ -1,0 +1,58 @@
+Chapter 7 - Transactions
+
+Meaning of ACID
+Atomicity
+    Basically describes that a system can only go from state A to state B without any intermediate state. If you want to write multiple rows, you either write all or none. No partial writes. If a single write fails during this batch write, the entire transaction is aborted.
+
+Consistency
+    This refers to the notion of the database being in a "good state"
+
+Isolation
+    Concurrently executing transactions are isolated from each other.
+
+Durability
+    Data written will not be lost somehow. Perfect durability does not exist
+
+Weak Isolation Levels
+If two transactions don't touch the same data, they can be safely run in parallel. Concurrency issues occur when one transaction reads data that is currently modified by another transaction.
+
+Read Committed
+1. When reading from database, you will only see data that has been commited
+2. When writing to the database, you will only overwrite data that has been committed.
+
+During concurrent writes, the "second" write will not occur until the first one is comitted. Usually implemented by some lock but this can harm response time for read-only transactions. Therefore, most databases keeps a copy of both the old committed value and the new uncomitted value.
+
+Snapshot Isolation and Repeatable reads
+Snapshot Isolation states that transaction reads from a consistent snapshot of the database, that is all the data comitted at the beginning of the read transactions. Even if data is subsequently changed by another transaction during the read transaction, it will only see the old data from the snapshot.
+
+Readers never block writers and writers never block readers.
+
+Patterns that cause Phantom Writes
+1. Select query checks whether some requirement is satisfied by searching for rows that match the search conditions (there are atleast two doctors on cal, there are no existing bookings for a specific room, username is not taken, etc)
+2. Depending on the result of the first query, application code decides how to continue.
+3. If app decides to go ahead, it makes a insert and commits transaction. The effect of this write may change the precondition of the decision of step 2. In other words, if you repeat step 2 now, the condition may be invalidated.
+
+You can try to lock all the rows returned in step 1 but if your initial query is to detect absence of rows, then a lock will not help you.
+
+How do we deal with phantom writes where there is no objects to write? Maybe you can materialize the conflicts. Say for a hotel room, you can say each room can be booked for one day at a time therefore, each room has 365 slots. Now you can explicity set locks on these rows.
+
+Serialization Isolation is regarded as the strongest isolation level. It guarantees that even though transactions may execute in parallel, the end result is the same as if they had executed one at a time, serially. Thus the database guarantess that if the transactions behave correctly when run individually, they continue to be correct when run concurrently, preventing ALL race conditions.
+
+Techniques for Serializability
+1. Literally executing transaction in serial order.
+    i. If you can partition your data in a way, you can maybe guarantee that a single transaction only touches on partition, then you can do serial transactions (one cpu core working on one partition).
+    ii. If you need cross-partition transactions, that will be a little harder and you need a lock-step across all partitions.
+2. Two phase locking
+    i. How the locking works
+        1. If transactions wants to read an object, it must first acquire the lock in shared mode. Several transactions are allowed to hold the lock in shared mode but if another transaction already has an exclusive lock, these transactions much wait.
+        2. If transaction wants to write to an object, it must first acquire an exclusive lock. No other transactions may hold any lock (either shared or exclusive) while someone has an exclusive lock. In addition, to acquire an exlusive lock, there can be no locks on a given object.
+        3. Transactions can upgrade their shared lock to an exlusive lock.
+        4. After transaction has acquired the lock, it must continue to hold the lock until end of transaction (commit or abort).
+3. Optimistic concurrency control (also known as serializable snapshot isolation)
+    1. All reads within a transaction is made from a consistent snapshot of the database.
+    2. The database must detect when a transaction is acting on an outdate premise (there are 2 doctors currently on call, this seat is open for this date) and abort the transaction. How can we know if a query result might have changed?
+        1. Detecting reads of a stale MVCC object (uncommitted write occurred before the read but has since been comitted). This can be accomplished if the database can track that when a transaction ignores another transaction due to MVCC rules, and if any of the ignored writes have since been committed, the transaction must be aborted.
+        2. Detecting writes that affect prior reads (the write occurs after the read). When two reads on the same object happens, database tracks the two transaction ids that are reading this item. When a transaction writes to the database, it must look in the indices for any other transactions that are currently reading the affected data and notifies them of potential outdatedness.
+
+
+

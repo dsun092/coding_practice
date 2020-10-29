@@ -1,0 +1,56 @@
+Lowest Common Ancestor of a Binary Tree
+https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/
+
+Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+There are two approaches we can use to solve this:
+
+Approach 1: Build path to target nodes then traverse path until divergence.
+
+1. Given root node, run DFS to find target node.
+
+We use a stack to keep track of path to a target node since items will be added to stack from target to source, so we want the target to be at bottom of stack.
+
+2. DFS recursion algorithm:
+    1. If node "" null return null;
+    2. If node "" target return target;
+    3. leftNode " dfs(node.left)
+        if leftNode !" null, add to path stack and return node
+    4. rightNode " dfs(node.right)
+        if rightNode !" null add to path stack and return node
+
+3. Keep a prevAncestor which is null
+4. while both stacks are not empty
+    leftAnces " leftStack.pop
+    rightAnces " rightStack.pop
+
+    if they are not equal, return prevAncestor
+    if they are equal, set prevAncestor to either left or right ances
+
+return null if not found for whatever reason
+
+Time Complexity:
+dfs to find first target: n
+dfs to find second target: n
+iterate through the stacks: upper bound n since the longest path can potentially go all the way down to leaf and theres no requirement saying binary tree is balanced.
+
+Space complexity:
+path to 1st target: n
+path to 2nd target: n
+recursive stack: n
+
+2. We traverse through the tree and find ancestors between left and right
+
+1. If node "" null, return null
+2. If node is either left or right node, return node
+3. If node is a leaf node, return null
+4. We recurse down left and right tree to get the ancestor of left and right.
+5. If both left and right are not null, the current is the common ancestor, return that node up
+6. If one is null and the other is not, return the non-null item.
+7. return null since we didn't find anything
+
+Time complexity:
+Iterate through every node in tree: n
+
+Space complexity:
+Recursive stack: n

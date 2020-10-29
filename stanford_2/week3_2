@@ -82,7 +82,7 @@ public class MSD
 
 
     private static int charAt(String s, int d)
-        if (d < s.lengt) return s.charAt(d);
+        if (d < s.length) return s.charAt(d);
         else return -1;
 
 Observation 1: Much too slow for small subarrays.
@@ -192,5 +192,5 @@ public String lrs(String s)
             lrs = suffixes[i].substring(0, len);
     return lrs;
 
-Problem: if the length of the Longest Repeast LRS is really long like 10 million, suffix sort will not work.
+Problem: if the length of the Longest Repeat LRS is really long like 10 million, suffix sort will not work.
 

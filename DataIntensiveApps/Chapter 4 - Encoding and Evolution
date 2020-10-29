@@ -1,0 +1,23 @@
+Chapter 4 - Encoding and Evolution
+
+REST and RPC
+REST emphasizes simple data formats, using URLs for identifying resources and uses HTTP features for cache control, authe, and content type.
+
+SOAP is an XML-based protocol for making network API requests which is usually done over HTTP but aims to be independent from HTTP. a SOAP web service will use WSDL to generate some client that calls local classes and method calls.
+
+RPC - Remote Procedure Call
+Tries to make a request to a remote network service look the same as calling a function or method in your programming language.
+i.e dynamoDbClient.putObject(object)
+
+This approach is fundamentally flawed however,
+1. network call is unpredictable and response time may vary.
+2. Local calls either succeed or throws an exception. Network calls can return without result because of timeout which means you don't know what happened.
+3. If you retry a failed network requests, it could be that responses are failing to come back so you are making duplicate actions.
+
+Message Brokers
+When client sends messages, rather than sending directly to server you can put it into a message broker which distributes the message to servers.
+1. Acts as a buffer if server is unavailable or overloaded.
+2. Automatically redeliver messages to a process that has crashed
+3. Avoids sender to know where to send message.
+4. Logically decouples sender from recipients. Sender just publishes a messages and recipients can consume.
+

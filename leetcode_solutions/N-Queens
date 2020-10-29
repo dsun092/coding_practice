@@ -1,0 +1,25 @@
+N-Queens
+https://leetcode.com/problems/n-queens/
+
+The n-queens puzzle is the problem of placing n queens on an n×n chessboard such that no two queens attack each other.
+
+We want to find all permutations/subsets where of possible board placements so we use a backtracking alogrithm to solve this problem.
+
+1. We keep a list of positions as our current placements
+2. We keep a list of results to add items into our results.
+3. Base backtracking is that we iterate through every position in the first row
+4. Recursive backtracking
+    1. If we reach a level that is the same as N, we know that we were able to successfully construct a full board with a queen at each level. Thus we iterate through all items in our positions stack and add it to results.
+    2. Otherwise we are still in a sublevel within our board.
+        1. For every position in our subboard, we check to see if it is safe to place a queen there.
+        2. If it is safe, we add it to our positions stack and backtrack down.
+        3. Once backtrack down that path is complete, we pop it from the positions stack.
+
+The time complexity of this is that we have to iterate through every permutation of the board which is n^n.
+
+space complexity:
+positions stack: n
+results stack: upper bound n
+recursion stack: n
+
+

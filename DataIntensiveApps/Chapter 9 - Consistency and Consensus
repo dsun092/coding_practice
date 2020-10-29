@@ -1,0 +1,59 @@
+Chapter 9 - Consistency and Consensus
+
+Consistency Guarantees
+Most replicated systems can provide eventual consistency guarantee which means that once the writes stop, eventually all the reads will reflect the most recent value. ALthough this is a weak guarantee as it doens't state when it'll catch up.
+
+Linearizability
+Even though database may give different answers depending on which node you query, you can give the illusion that there is only one replica. This means that the application code does not have to worry about getting different results on read.
+
+In a linearized system, as soon as one client successfully completes a write, all clients reading from the database must be able to see the value just written.
+
+Linearizability is a recency guarantee on reads and writes of an individual objects. When do you need Linearizability?
+    1. Make sure you don't sell more than you have in stock
+    2. don't book people on same seat
+These all require there to be a single up-to-date value on a particular value (stock level, seat occupancy, etc)
+
+How to implement linearizable systems
+The basic idea behind linearizable system is that it should behave as though there is only one copy of the data and all operations on it are atomic. Therefore the simplest answer is to have one copy of the data but this is not fault tolerant.
+
+Single-Leader Replication (potentially linearizable)
+If you make reads from leader or synchronously update followers, they have potential to be linearizable.
+    1. Snapshot isolution conflicts with linearizability since you may read an old value
+    2. Async replication, failover may even lose comitted writes which violates durability and linearizability
+
+Consensus Algorithms (linearizable)
+1. See ZooKeeper
+
+Multi-leader replication (not linearizable)
+Not linearizable beacuse they process writes on multiple nodes and async replicate them to other nodes. For this reason they can produce writes that require resolution.
+
+Leaderless Replication (probably not linearizable)
+
+Linearizability is attractive because it implies an order of things which makes data flow easy to work with from application stand point. However it comes at a performance cost so many systems chose not to provide such guarantee.
+
+You can capture casual dependencies in nonlinearizable systems. You may want to guarantee a partial order where you want to know which operation happened before which other operation.
+
+We can use sequence number (some strictly increasing number) to track order of operation.
+
+Consensus
+Consensus is one of the most important and fundamental problems in distributed computing. The goal is to get several nodes to agree on something. When do we need consensus?
+
+1. Leader Election
+    All nodes need to agree on which node is the leader. If there were two leaders, both would accept writes and their data would diverge, leading to inconsistency and data loss.
+2. Atomic commit
+    When a commit happens, all the nodes either need to agree for a complete roll back or they all commit.
+
+Atomic Commit and 2-phase commit
+Atomic commit ensures an all or nothing change. If you modify multiple objects or have secondary indices, you want to make sure your changes are reflected everywhere and not have some half-finished state.
+
+Two-phase commit is an algorithm for achieving atomic transactions across multiple nodes
+1. Uses a coordinator/transaction manager. The coordinator is often implemented as a library within the same application process that is requesting the transaction.
+2. Begins with application reading and writing data on multiple database nodes. When the application is ready to commit, the coordinator begins phase 1: it sends a prepare request to each of the nodes, asking them whether they are able to commit.
+    a. If all participants reply yes, then the coordinator sends out a commit request
+    b. If any participants reply no, coordinator sends an abort request
+
+1. When app wants to begin a distributed transaction, it request a transaction ID from coordinator. This is globally unique
+2. App begins a single-node transaction on each of participants and attches the globally unique transaction ID to the single-node transaction. All reads and writes are done in one of these single-node transaction.
+3. When participant receives the prepare request, it makes sure that it can definitely commit the transaction.
+4. Once coordinator receives response, it makes a definite decision whether to commit or abort.
+5. Once coordinator's decision is writtent o disk, the commit or abort request is sent out. If this request fails, coordinator must retry forever until it succeeds.

@@ -1,0 +1,39 @@
+Chapter 2 - Data models and Query Languages
+
+Relational vs Document Model
+Relational is good at modeling business concepts with relations. However the birth of NoSQL came because
+1. Need for greater scalability (high write throughput)
+2. free and open source software
+3. specialized query operations not well supported by relational models
+4. Restrictiveness of relational schema
+
+Document models have better locality (data is nearby each other)
+Relational models have bad locality. Similar data may be on different tables or even different clusters
+
+Relational models try to remove duplication by normalizing data.
+
+Declarative vs Imperative language
+SQL is declaractive where you sort of declare what you wanna do and the query optimizer will perform what it thinks is most optimal order.
+
+Many programming languages are imperative where commands are executed in sequence.
+
+Relational vs Document Models pros and cons
+
+Relational
+Pros:
+1. Good for many to many relationships
+2. query optimizer often optmizes performances on joins and filters since all the data is laid out in simple tables
+3. Easy to build new indexes to improve query performance.
+
+Cons:
+1. Data split between multiple tables.
+2. Schema on write.
+
+Document
+Pros:
+1. Good for one to many relationships
+2. better data locality so faster read on documents
+3. better schema flexibility since schema is enforced on reads
+
+Cons:
+1. less support for complicated queries

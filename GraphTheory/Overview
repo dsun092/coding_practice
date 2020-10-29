@@ -1,0 +1,30 @@
+Overview
+
+Common Graph Problems
+1. shortest path
+    1. BFS (unweighted graph)
+    2. Dijkstra's
+    3. Bellman=ford
+    4. Floyd Warshall, etc
+
+2. Connectivity (does there exist a path from node A to node B)
+    1. Use union-find or DFS
+
+3. Detecting negative cycles
+    1. bellman-ford
+    2. floyd-warshall
+
+4. Strongly Connected Components
+    1. Tarjan's and Kosaraju's
+
+5. Finding bridges in a graph
+    1. edges that when removed will increase number of connected components
+6. Articulation points
+
+7. Minimum Spanning Trees
+    1. Kruskals
+    2. Prims
+
+8. Network flow: max flow
+    1. Ford-fulkerson
+    2. Edmonds-Karp

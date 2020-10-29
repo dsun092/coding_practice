@@ -1,0 +1,10 @@
+https://leetcode.com/problems/merge-k-sorted-lists/submissions/
+
+
+[Intern Final Presentation] Automating Release Report / Automating EC2 Cost Evaluation
+
+Overview:
+
+At the end of every data release, a list of statistics and information must be compiled into a readable report. Python script for automating such release report has been added to the MTDatasets package. By running the script, the team is now able to generate a csv file with aggregated statistical data from selected release data and inspector data. The script also generates a source code text to create a release report on Amazon Wiki. The text file can be copy and pasted into wiki directly through web browsers or generated within terminal commands.
+
+For each data release, a series of Spark jobs are run on public EC2 for MT Luigi and Crawler team. The AWS Cost Explorer console and the Monthly Statement provide a limited view of cost breakdown to ApplicationID levels based on a time filter. A Lambda package has been created for users to 1) receive a monthly EC2 cost evaluation with CloudWatch Events and Simple Email Service, 2) be able to generate cost evaluation from AWS command line with a specific timeframe and granularity.

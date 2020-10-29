@@ -1,0 +1,133 @@
+Chapter 5 - Distributed Data | Replication
+
+Why distribute database?
+1. Better scalability
+2. Better fault tolerance/availability
+3. Better latency
+
+Replication
+Keeping multiple copies of your data
+
+1. Can keep data geographically closer to users and reduce latency
+2. Allow system to work even if some parts have failed
+3. scale out number of machiens that can serve read queries
+
+Difficulty of replication comes with changes to data. Three ways for handling changes
+    1. Single Leader
+    2. Multi leader
+    3. leaderless
+
+Trade-offs to consider with replication
+1. Synchronous vs Asynchronous
+2. how to handle failed replicas
+
+Single-Leader
+1. One of replicas is designated the leader and all writes must be first written to leader.
+2. Other replicas known as followers gets data changes from leader as part of a replication log or change stream and applies it to its local storage.
+
+Sync vs Async replication
+During a synchronous replication, client will wait until data is fully replicated.
+
+This ensures that data is always up to date (strong read consistency) but failure to update a follower node will result in a block. Synchronous replication usually means one node is synchronous and the rest are async. If the synch follower becomes unavailable or slow, one of the async followers is made sync.
+
+Full async
+1. If leader fails, any writes not replicated to followers are lost. This means writes are not guaranteed to be durable.
+2. Leader can continue to write even if followers have fallen behind which means better write throughput.
+
+Setting up new followers
+1. Take a consistent snapshot of leader's database at some point.
+2. Copy snapshot to new follower
+3. Follower connects to leader and requests all data changes that have happened since snapshot.
+4. When follower finish processing backlog of data changes, we say it has caught up.
+
+Follower Failure: catch-up recovery
+1.Each follower keeps a log of data changes it has received from leader. If follower is restarted, the follower can recover from the log. Follower then can connect o leader and request all data changes since last entry in local log.
+
+Leader Failure: Failover
+1. One of followers need to be promoted to leader and client needs to be reconfigured to send all writes to new leader
+
+Implementation of replication logs
+Statement-based
+1. Every write request as a statement and forwards the statement to followers.
+2. Has some problems though
+    1. nondeterministic functions such as NOW() and RAND()
+    2. autoincrementing columns or updates that depend on other data must be executed in order and can have concurrency issues.
+    3. Statements that have side effects like triggers may result in different side effects unless side effects are deterministic
+
+Write-ahead log
+The log is an append-only sequence of bytes that contains all writes to database. Followers can construct exact same data structure using this log.
+1. However now you are coupled with the storage engine that parses this log
+
+Logical log
+A logical log for a relational database is usually a seq of records describing writes to database tables
+    1. for insert row, the log contains the new values of all columns
+    2. For a deleted row, the log contains enough info to uniquely identify row was deleted
+    3. For update, the log contains enough information to identify the update row and new values of all columns
+
+Replication Lag
+If you write something and you then you read it immediately. If you read from the follower nodes, you might not see your most recent updates. We need read-after-write consistency atleast for things modified by user.
+
+1. For things modified by user, always read it from leader, otherwise read from follower. However this requries that you have some way of knowing whether something might have been modified by user without querying. Always load user's own data (i.e profile) from leader
+2. If most things in application are editable, you won't be effective as all reads will be from leader. One thing you can do is keep a last updated timestamp and for one minute after last update, read from leader. You can also monitor replication lag on followers and not query any follower more than one minute behind leader
+3. Client can remember timestamp of most recent write and the system can ensure that any reads must be must be atleast until that timestamp. If replica is not up to date, either go to new replica or wait until replica is up to date.
+
+Another complication arises when same user is accessing your service from multiple devices. You want to provide cross-device read after write consistency.
+    1. approaches that use a last update timestamp becomes more complicated because device B doesn't know last update by device A
+
+Multi-Leader Replication
+Used in multi-datacenter operations.
+Used in clients with offline operation
+
+For example if you have a calender app, you need to be able to see your meetings and make new meetings regardless of whether you device is currently online or not. Any changes you make offline needs to be synced with a server and your other devices when the device is online.
+
+Every device may have a local database that acts as a leader that accepts write requests.
+
+Real-Time collab Editing Apps allow people to edit documents at same time like google docs.
+1. When a user updates the document, the changes are instantly applied to their local replica and async replicated to server and other users who are editing same document
+2. If you want to guarantee that there are no editing conflicts, the application must obtain a lock on the document before a user can edit it.
+
+Multi-leader configures, there is no ordering defined for writes. How do we converge on conflicts?
+1. Give each write a unique ID pick the write with the highest ID as winner. Prone to dataloss however
+2. Try to merge values together
+3. Record conflict in an explicit data structure that preserves all the information and write application code that resolves the conflicts.
+
+Leaderless Replication
+In leaderless application, the client will either directly send its request to all leaders or a coordinator node will do this on behalf of client.
+1. Lets say you submit a write to 3 replicas but 1 of them fail.
+2. If that stale replica comes back, you may read stale data so you also read from all 3 nodes.
+3. Version numbers are used to determine latest value.
+
+How to repair stale nodes?
+1. Read repair
+    When client makes a read, it can detect any stale response and update the stale nodes
+2. Anti-entropy
+    Datastores have background process that constantly looks for difference in data between replicas and copies missing data.
+
+If you have n replicas and every write is confirmed by w nodes to be succcessful, then we must query atleast r nodes for each read.
+As long as w + r > n, we can expect an up-to-date value when reading.
+
+The quorum condition w + r > n allows the system to tolerate following
+1. If w < n, we can still process writes if a node is unavailable
+2. If r < n, we can still process reads if a node is unavailable
+3. With n = 3, w = 2, and r = 2 we can tolerate one unavailable node.
+4. With n = 5, w = 3 and r = 3 we can tolerate two unavailable nodes
+5. Normally, reads and writes are sent to all n nodes, w and r just determines how many nodes we wait for.
+
+If fewer than w or r nodes are available, read and writes return an error.
+
+Trade offs between Single vs Multi vs Leaderless
+Single leader is easy to understand and there is no conflict resolution
+
+Multi leader and leaderless can be more robust in presence of faulty nodes but provide weaker consistency guarantees
+
+Some guarantees we can offer
+1. Read after write consistency.
+2. Monotonic reads.
+3. Consistent prefix reads.
+
+Conflict Resolution
+Happens Before
+1. Server maintains a version number for every key, it increments the version number everytime that key is written, and stores new version number along with value written
+2. When client reads a key, the server returns all the values that have not been overwritten as well as the latest version number. Client must read a key before writing
+3. When a client writes a key, it must include the version number from the priori read and it must merge together all values it received in prior read.
+4. When the server receives a write with a particular version number, it can overwrite all values with that version number or below but it must keep all values with higher version number.

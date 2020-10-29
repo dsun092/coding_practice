@@ -1,0 +1,90 @@
+Hotel Booking
+
+What kind of hotel booking?
+Do we manage the reservations and we act as source of truth for hotels
+vs
+Do we interface with a hotel's API and their internal reservation system.
+
+What kind of features are we providing?
+For hotel admins:
+1. Onboard
+2. Add rooms
+3. Configure availability
+
+For Users:
+1. Search by region, dates, keywords
+2. Book a hotel room.
+    2.a assuming theres a separate payments system
+3. Reviews/comments?
+
+Audience
+1. Global or regional?
+
+Priorities?
+1. What kind of latency do we care about?
+    1. Fast latency for searching
+    2. Semi fast for booking
+    3. Ensure strong consistency in booking
+    4. How much availability?
+        99.99? - an hour a year
+        99.9 - 8 hours a year
+2. What kind of consistency do we want for searching?
+    1. If we search for hotels by date range, we don't want to show places that don't have any rooms
+    2. If a room is book, should the search immediately reflect that
+
+Data types
+Hotel (10kb per record)
+hotelId | location (geo) | metadata
+
+RoomType (5kb)
+RoomTypeId | Metadata
+
+Room (100B per record)
+RoomId | RoomType | Date | Price | Available
+
+Booking (100B per record)
+BookingId | UserId | RoomId | Date | Status (reserved, booked, cancelled)
+
+
+What kind of scale are working with here?
+Global user base (>100million users)
+~ 1 million hotels (10 gb worth of hotel data)
+~ each hotel has maybe 20 room types (100GB worth of room type data)
+~ each hotel has on average 100 rooms so 100m total rooms
+~ 100m total rooms * 365 days a year -> 365 billion potential rooms. (2TB worth of rooms data)
+
+How will search work?
+Elasticsearch cluster to power.
+1. How will elasticsearch get populated? How should a document look like?
+    1. Each hotel document can have an associated field "unavailableDates"
+    2. We can have some pubsub that consumes some events of notifications from bookings
+        i. we'll have some consumer service that consumes updates from hotelUpdates and updates ES documents when necessary
+            a. when a hotel is out of rooms for a given date.
+2. How can we improve latency of search queries?
+    1. We can have multiple ES cluster per region.
+    2. Users closer to a single region will hit their closest ES cluster.
+    3. Have backup clusters for redundancy (availability).
+
+
+How booking works?
+We need a DB that offers strong write consistency.
+1. Once a user gets list of hotels, it'll click on hotels to view list of rooms
+2. Goes to Rooms DB to fetch rooms with availability for all days in date range.
+    select distinct * from room, roomType
+        where date > checkin && date <= checkout
+        where available = true
+
+    This query should return at most 1 room per room type that is available for all days.
+
+3. once user clicks "book"
+    1. Transactionally put entry in book and mark room as unavailable
+    2. Use some TTL expiration lock that expires after some time (15 minutes)
+    3. Go to payments platform (stripe, square, visa)
+        i. if successful:
+            1. mark booking as booked
+        ii. if unsuccessful:
+            1. exponential back-off with idempotency key
+            2. if still unsuccessful after X times, return error and mark booking as cancelled and those dates as available.
+    4. Once booked, send a notification to some pubsub that notifies some server to check if they need to update elasticsearch
+
+

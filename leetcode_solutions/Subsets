@@ -1,0 +1,13 @@
+Subsets
+https://leetcode.com/problems/subsets/
+
+Given a set of distinct integers, nums, return all possible subsets (the power set).
+
+Since we want to find all subsets from a given number, we use a back tracking approach which means we visit every permutation of the subsets.
+
+Backtracking Algorithm
+1. If we have reached past the array, exit.
+2. Process current item that we are backtrack to
+3. Add it to our stack
+4. backtrack into it
+5. pop it off our stack.

@@ -1,0 +1,11 @@
+Invert Binary Tree
+https://leetcode.com/problems/invert-binary-tree/
+
+Invert a binary tree.
+
+We can use recursion to traverse the tree and for a given node, we swap the left and right children.
+
+1. if current node is null, return null
+2. swap left and right child.
+3. recurse down left and right tree.
+4. return root.

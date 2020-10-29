@@ -1,0 +1,90 @@
+Chapter 3 - Storage and Retrieval
+
+Log Structured Storage vs Page-Oriented Storage
+
+LS-Storage
+The idea is that a database uses an internal log which is an append-only file. Writing is quick but read is bad. In order to solve bad read, you have an index but the trade off is that it slows down writes because every write now needs to update an index.
+
+Append-Only Strengths
+1. appending and segment merging are sequential write operations whih are faster than random writes.
+2. Concurrency and crash recovery are simpler if segment files are immutable.
+3. Merging old segments avoids problem of data files getting fragmented.
+
+Let's say we can now store a segment files as sorted by a key.
+1. Merging segment files is a simple mergesort. If same key appears in several inputs, keep the value from most recent segment file.
+2. In order to find a particular key, you now just need to a sparse index where each entry is the beginning item in a segment file.
+
+1. When a new write comes in, add it to an in-memory balanced tree (memtable)
+2. When the memtable gets bigger than some threshold, write it out to disk as an SSTable file. The new SStable file becomes the most recent segment of the database. While the SSTable is being written out to disk, new writes can continue to a new memtable instance.
+3. In order to serve a read request, first try to find the key in the memtable, then in the most recent on-disk segment, then in next-older segment, etc.
+4. From time to time, merge segment files and discard old segment files.
+5. Keep a separate log on disk for every write. That log does not have be sorted by keys but its only purpose is to restore the memtable after a crash. Everytime a memtable is flushed, the log file can be discarded.
+
+Performance optimizations for LS-Storage
+1. Read requests is slow if key is not in database (first look in memtable, then scan through all segment files)
+    1. We can speed this up by using a bloom filter which is a memory efficient data structure for approximating the contents of a set. It can tell you if a key appears in database
+2. How do we decide when to merge SSTable files?
+    1. Size-tier takes newer and smaller SSTables and are merged into older and larger SStables.
+    2. level-compaction, the key range is split up into smaller SStables and older data is moved into separate levels.
+
+B-Tree Indices
+Standard index implementaions in almost all relational databases and nonrelational databases
+
+Properties of B-Tree
+1. Keeps key-value pairs sorted by key which allows efficient key value lookups and range queries.
+2. Breaks databases down into fixed-size blocks or pages (4KB usually). More closely emulates a hardware disk
+3. Each page can be identified using an address or location.
+4. One page is designated as the root of a B-tree. Leaf page contains actual individual keys which either contain the inline value or a refernece to the document where values can be found.
+5. # of references to child pages in one page is called branching factor.
+
+Writes and Reads
+1. To search for a key, you traverse through b-tree to find leaf page that contains key.
+2. To update the value for a key, you find the leaf page that contains key and overwrite the value so the original reference remains valid.
+3. To add a new page, you go to leaf page to add.
+    1. If theres space, add it.
+    2. If theres no space, split the leaf page into 2 half-full leaf pages. The parent leaf is then updated to account for the new subdivision of key ranges.
+
+Making B-Tree reliable
+1. Updates require overwriting an existing page which is an actual hardware operation.
+    1. Disk head to right place,
+    2. Wait for right position on spinner platter
+    2. Overwrite with new data.
+If some operations require several different pages to be overwritten, such as a page split, you need to make sure crashes will not cause orphan pages.
+    1. Use Write-ahead log which is an append-only file to which every B-tree modification must be written because the actual tree and pages itself are modified.
+Additional complication of updating pages in place is careful concurrency control is required.
+
+Comparing LSM vs B-Trees
+LSM is faster for writes whereas B-tree is faster for reads
+    1. Faster for writes because they write sequential files rather than overwrite several pages in the tree.
+    2. Less write amplification means higher throughput of writes.
+
+Downsides of LSM-trees
+1. Compaction process can sometimes interfere with performance of ongoing reads and writes.
+2. Another issue with compaction arises at high write throughput: the disk's finite write bandwidth needs to be split between new writes and compaction threads running in background.
+
+Other Indexing Structures
+Secondary indices are crucial for performing joins efficiently. Keys on secondary indices does not have to be unique.
+
+Keys in a secondary indices can either contain the values inline as a row or point to a row stored elsewhere known as a heap file. Heap file approach is nice because it avoids duplicating data when new secondary indices are present and updating a value, you can simply update the file itself without updating all the references
+    1. The caveat is that if the update causes file to be too big then it needs to be written to a new place and all the indices either need to be updated or a forwarding pointer is left behind.
+
+Multi-column indices
+1. you can concat all the columns you want together i.e lastname, firstname. You can query by lastname and firstname or by lastname but you cannot query by firstname.
+
+Transaction Processing or Analytics?
+Transaction like making a sale, paying someone, etc.
+1. Small number of records per query, fetched by key.
+2. Random-access, low-latency writes from user inputs
+3. USed by user/customer via some client or application
+4. Latest state of data (transactions should update or read the latest value)
+5. Gigabytes to terabytes
+
+Analytic queries require things like
+What was total revenue of each of our stores in january?
+1. Aggregate over large number of records
+2. bulk import or event stream
+3. use for data analytics or internal useage.
+4. history of events that happened over time (doesn't have to be most recent)
+5. terabytes to petabytes of data
+
+

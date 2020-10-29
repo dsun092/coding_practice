@@ -1,0 +1,10 @@
+What can DFS do?
+
+1. Compute a graph's minimum spanning tree
+2. Detect and find cycles
+3. check if a graph is bipartite
+3. find strongly connected components
+4. topological sort
+5. find bridges and articulation points
+6. find augmenting paths in a flow
+7. generate mazes

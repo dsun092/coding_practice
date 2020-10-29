@@ -1,0 +1,66 @@
+Chapter 6 - Partitioning
+Partitioning is usually combined with Replication so that copies of a partition is stored on multiple nodes.
+
+A node can store more than 1 partition. So let's say node 1 acts as leader for partition 1 and follower for partition 2 and 3 where as node 2 acts as leader for partition 2 and follower for partition 1 and 3 and etc.
+
+How should we partition data?
+
+1. By Key Range
+Each partition can be assigned some continuous range of keys from a minimum to maximum. If you know the boundaries between ranges, you can easily determine which partition contains a given key.
+
+THe key range might not be evenly distributed so needs to be able to handle that.
+
+2. Partition by Hash of Key
+Used to de-risk skew and hot spots. Keys are distributed more randomly but you can't do range queries.
+
+Although hashing keys does distribute them more evenly, there are extreme cases where hot spot can still occur. For example if a celebrity has millions of followers and does something, maybe millions of people will tweet at them, all of which update the same celebrity id.
+
+Parititioning and Secondary Indexes
+
+Secondary Indexes by Document.
+Each partition maintains its own secondary index and cover only the documents in that partition. Whenever you need to read, write, or remove you only need to deal with that partition that contains the document ID. THis is known as a local index
+
+However when reading, you gotta scan through the secondary index of all partitions to make sure you grab everything.
+
+Secondary Indexes by Term
+Constructs a global index that covers data in all partitions. However the global index needs to partitioned as well but can be partitioned separately from the primary key.
+
+For example, all documents where color: red can be on partition 1 and all documents where color: grey can be on partition 2
+
+Global index makes reads more efficient however writes are more complicated. A single document write may now affect the index on many partitions. Therefore updates to global indices are usually eventually consistent
+
+Rebalancing Partitions
+1. Query throughput increases
+2. dataset size increased
+3. machine fails so other machines gotta take over.
+
+No matter which partitioning scheme, rebalancing is usually expected to meet the following requirements:
+1. Load should be fairly distributed
+2. Database should still accept reads and writes during rebalancing
+3. No more data than necessary should be moved between nodes
+
+Strategies for Rebalancing
+
+Fixed # of Partitions
+Create more partitions than nodes and assign several partitions to each node. A database running on a 10 node cluster can be split into 1,000 partitions. When a node is added, it can "steal" a few partitions from every existing node until partitions are fairly distributed once again.
+
+If a node is removed from the cluster, the partitions that the node contained is distributed back to nodes. The # of partitions does not change nor does the assignment of keys to partitions. The transfer of partitions takes time so the old assignment of partitions is used for any reads and writes that happen while the transfer is in progress.
+
+However this requires you to pre-determine the fixed # of partitions your cluster will have. You have to choose a high enough to accommodate future growth but each partition has management overhead (replication) so having too many can be counter productive. Choosing the right number is difficult if your data size is highly variable.
+
+Dynamic Partition
+key range partition prefer to use dynamic partitioning where if a partition exceeds a configured size, it splits into 2 partitions. Conversly, if a lot of data is deleted, it can be merged with an adjacent partition.
+
+When you configure your database, you can configure a pre-split if you know your key range.
+
+Automatic vs Manual Repartition
+Automatic can be dangerous where if you have a node that is overworked, the cluster might say this node is dead and is going to try to rebalance the cluster to move load away from it. This puts additional load on the overloaded node as well as other nodes.
+
+Request Routing
+How do we figure out which node to connect to as partitions are moved around.
+
+1. Round-robin load balancer. Client can contact a bunch of nodes until it finds the one that contains the data.
+2. Send all requests from clients to a routing tier thats sort of like a partition-aware load balancer.
+3. Require that clients be aware of partitioning
+
+When partitions are changed, all participants must acknlowdge the change. Many systems can use a separate coordination service which maintains a list of partitions.

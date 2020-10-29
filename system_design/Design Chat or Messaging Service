@@ -1,0 +1,6 @@
+Design Chat or Messaging Service
+
+What kind of connection protocol?
+Websocket works best because it maintains bi-directional connection.
+
+Use redis distributed cache.

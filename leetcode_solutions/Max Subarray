@@ -1,0 +1,31 @@
+Max Subarray
+
+Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
+
+Since we want maximum subarray we can use dynamic programming to calculate.
+
+The objective function:
+Given an array of size N
+F(N) " maximum subarray where we must end on arr[N]
+
+Base case
+F(0) " arr[0] since the maximum subarray with only one item is itself
+
+Recursive case
+F(i) " maximum subarray where we must end on arr[i] which is Math.max(F(i-1) + arr[i], arr[i])
+
+This means that at a given item, the current item is either better off by itself or we also include this item as part of previous subArray. If prev maxSub is positive and current item is negative, the maxSub array ending on currentItem is the sum. If prev maxSub is negative, then the currentItem is better off by itself.
+
+At every point in our recursive case, we check the maximum subarray(i) with the current maxSubarray and if its greater, then we update current maxSubarray.
+
+Where to find solution
+we return maxSubarray.
+
+We can optimize the space complexity since we don't need a full DP of every solution, we only the F(i-1) therefore we can just use a variable to keep F(i-1) and update within each loop call.
+
+Time complexity:
+iterate through every item in array: N
+
+space complexity:
+if we use dp array: n
+if we use pointer: 1

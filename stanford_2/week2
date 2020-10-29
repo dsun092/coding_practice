@@ -132,22 +132,23 @@ Index Based Priority Queue.
 Need 3 parallel arrays to keep track.
 
 PQ
-this is contains the actual priority index
+this is contains the actual priority index. Items in this array are the indices in Keys array
 
 QP
-this is a reverse mapping of priority index
+this is a reverse mapping of priority index. Items in this array
 
 Keys
-this is a mapping of the priority index of a given key.
+this is a mapping of the priority index of a given key. Items in this array is the priority of a Key.
 
 PQ[1] such that the item in Keys[PQ[1]] is of the highest priority
-
 QP[0] such that the item in PQ[QP[0]] is the index of the highest priority in Key
     QP[i] says that for a given Key[i], its position on the PQ is PQ[QP[i]]
-
 Key[i] is the value of the key associated with priority index at QP[i]
 
-so if i say given a vertex with v, it exist in the priority queue if QP[v] != -1
+Let's say we have a list of Keys where a Key is the ID of a vertex or node from 1 ... k
+Key[k] is the priority for a vertex with id k
+PQ stores always the highest priority k in PQ[1].
+QP stores where in the PQ a given k is. So if I want to know if PQ contains a given k, i would check QP[k].
 
 
 How does lazy vs eager algorithm differ?

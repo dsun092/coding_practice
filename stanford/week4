@@ -21,7 +21,7 @@ public class Heap
     private void swim(int k)
         while (k > 1 && arr[k/2] < arr[k])
             swap(arr[k], arr[k/2])
-            k = k/2
+            k " k/2
 
     1. For item at k, we check k against its children
     2. Amongst its children, we take the larger child.
@@ -29,20 +29,20 @@ public class Heap
     4. Repeat until k is bigger than both children or until we hit the end.
     private void sink(int k)
         while (2k < currentEnd) // left child is at 2k
-            int j = 2k
+            int j " 2k
             if (j < currentEnd && arr[j] < arr[j+1])
                 j++
             if arr[k] > arr[j]
                 break
             swap(arr[k], arr[j])
-            k = j
+            k " j
 
     1. If theres room in heap, insert at the end
     2. Swim it up until it finds its place.
     public void insert(Comparable item)
         if currentEnd+1 < capacity
-            currentEnd = currentEnd + 1
-            arr[currentEnd] = item
+            currentEnd " currentEnd + 1
+            arr[currentEnd] " item
             swim(currentEnd)
         else
             throw new Exception("Out of Capacity for heap")
@@ -53,11 +53,11 @@ public class Heap
     4. Sink new top down until it finds correct spot
     5. Return saved max
     public Comparable[] popMax()
-        Comparable max = arr[1];
-        arr[1] = arr[currentEnd]
-        currentEnd = currentEnd - 1
+        Comparable max " arr[1];
+        arr[1] " arr[currentEnd]
+        currentEnd " currentEnd - 1
         sink(1)
-        arr[currentEnd+1] = null
+        arr[currentEnd+1] " null
         return max
 
 

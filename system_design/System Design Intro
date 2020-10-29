@@ -1,0 +1,61 @@
+System Design Intro
+
+Terminologies
+
+Vertical vs Horizontal scaling:
+    * vertical scaling means taking your machine and making it more powerful with better cpu, more memory, more storage, etc.
+    * Horizontal scaling means adding more clusters to distribute tasks to handle scalabiliy. Has issues that comes with distributed systems but can scale infinitely
+
+CAP Theorem:
+C - Consistency: Read has most recent write
+A - Availability: you will always get a response back
+P - Partition tolerance: Sometimes network packets will be dropped
+
+CAP theorem states that you can only have 2 of 3 things. You usually always have to have partition tolerance so you can usually choose either between consistency or availability.
+
+ACID vs BASE
+ACID: used for relational database
+BASE: used for noSql databases
+
+Partitioning/Sharding data
+* Split data between different database nodes.
+* Use consistent hashing.
+
+Optimistic vs Pessimistic locking
+* Optimistic locking: checking transaction state as you write.
+* Pessimistic locking: acquire locking then work.
+
+Strong vs Eventual Consistency:
+Strong: Read will always give back latest data
+Eventual: Read will always see some data and eventually show latest data.
+
+Relational DB vs NoSql:
+Types of NoSql:
+    * Key Val pairs
+    * Wide Column
+    * Document based
+    * Graph based
+
+Caching:
+* Used to speed up request.
+* Distributed vs isolated caching.
+* Eviction policies
+
+Data centers:
+
+CPU, Memory, Hard drive, Network bandwidth
+
+Random vs Sequential read/write on disk
+
+http vs http2 vs websockets
+TCP/IP models
+IPv4 vs IPv6
+TCP vs UDP
+DNS lookup
+https & tls
+Public key Infrastructure
+Load Balancers:
+    L4:
+    L7:
+CDN & Edge
+Bloom Filters & Count-Min Sketch

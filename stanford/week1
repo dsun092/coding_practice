@@ -16,24 +16,24 @@ public interface UF
 
 Data structure 1: Quick Find
 Assume we have an array of size n and the parent of an item at index x is the value.
-arr[2] = 4 <- 2 is connected to 4 and 4 is the parent of 2.
+arr[2] " 4 <- 2 is connected to 4 and 4 is the parent of 2.
 
 public class QF implements UF
     public class QF(int n)
-        val arr = new Array[Int](n)
+        val arr " new Array[Int](n)
 
     1. To do a union of the 2 we arbitrarily assign a to b
-    2. find all values in arr where arr[i] == arr[a] and set them to arr[b]
+    2. find all values in arr where arr[i] "" arr[a] and set them to arr[b]
     void union(int a, int b)
         // we pick to always assign the parent of a to b
-        val parentOfB = arr[b]
-        val parentOfA = arr[a]
+        val parentOfB " arr[b]
+        val parentOfA " arr[a]
         for x <- arr.length {
-            if (arr[x] == parentOfA) arr[x] = parentOfB
+            if (arr[x] "" parentOfA) arr[x] " parentOfB
         }
 
     boolean connected(int a, int b)
-        return arr[a] == arr[b] // simple comparison
+        return arr[a] "" arr[b] // simple comparison
 
 Size Constraints:
 The data structure is limited by the initial N and does not grow so we can have at most N items
@@ -48,29 +48,29 @@ When we do union, we find the root of both values and arbitrarily merge the item
 
 public class QU implements UF
     public QU(int n)
-        val arr = new Array[Int](n)
+        val arr " new Array[Int](n)
 
-    1. Find root of value by keep following until we reach to a point where a = arr[a]
+    1. Find root of value by keep following until we reach to a point where a " arr[a]
     private int root(int a)
         // For a given point a, we say the parent of a is arr[a]
-        var currentVal = a // start at given value
-        while (currentVal != arr[currentVal]) { // while the current value at index is not equal to entry at index
-            currentVal = arr[currentVal] // we follow it up
+        var currentVal " a // start at given value
+        while (currentVal !" arr[currentVal]) { // while the current value at index is not equal to entry at index
+            currentVal " arr[currentVal] // we follow it up
         }
         return currentval
 
     2. Find root of both a and b and set arr[A] to root of B
     void union(int a, int b)
-        val rootA = root(a) // get the root of a
-        val rootB = root(b) // get root of b
-        arr[rootA] = rootB // we set the root of a to root of b
+        val rootA " root(a) // get the root of a
+        val rootB " root(b) // get root of b
+        arr[rootA] " rootB // we set the root of a to root of b
         return
 
     1. Check if rootA and rootB are equal
     void connected(int a, int b)
-        val rootA = root(a)
-        val rootB = root(b)
-        return rootA == rootB
+        val rootA " root(a)
+        val rootB " root(b)
+        return rootA "" rootB
 
 Size Constraints:
 same as above
@@ -83,16 +83,16 @@ Keep a separate size array to keep track of size of the root
 
 public class OptimizedQU implements UF
     public OptimizedQU(int n)
-        val arr = new Array[Int](n)
-        val size = new Array[Int](n).withInitialValues(1)
+        val arr " new Array[Int](n)
+        val size " new Array[Int](n).withInitialValues(1)
 
     1. When finding root, go ahead and assign the parent of current item to its grandparent
     2. this flattens the tree everytime we traverse
     private int root(int a)
-        var currentVal = a
-        while (currentVal != arr[currentVal]) {
-            arr[currentVal] = arr[arr[currentVal]] // we assign the parent value at currentVal to its parent's parent
-            currentVal = arr[currentVal] // we go visit it's parent.
+        var currentVal " a
+        while (currentVal !" arr[currentVal]) {
+            arr[currentVal] " arr[arr[currentVal]] // we assign the parent value at currentVal to its parent's parent
+            currentVal " arr[currentVal] // we go visit it's parent.
         }
         return currentVal
 
@@ -101,17 +101,17 @@ public class OptimizedQU implements UF
     3. When we union trees, we double the size of current union and we can at most merge
         into a union lg(N) times.
     void union(int a, int b)
-        val rootA = root(a)
-        val rootB = root(b)
-        if rootA == rootB return
+        val rootA " root(a)
+        val rootB " root(b)
+        if rootA "" rootB return
         if (size[rootA] > size[rootB])
-            arr[rootB] = rootA
-            size[rootB] += size[rootA]
+            arr[rootB] " rootA
+            size[rootB] +" size[rootA]
         else
-            arr[rootA] = rootB
-            size[rootA] += size[rootB]
+            arr[rootA] " rootB
+            size[rootA] +" size[rootB]
         return
 
     void connected(int a, int b)
-        val rootA = root(a)
-        val rootB = root(b)
+        val rootA " root(a)
+        val rootB " root(b)

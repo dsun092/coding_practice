@@ -8,48 +8,48 @@ Merge Sort
 public class Merge
 
     void merge(Comparable[] a, Comparable[] aux, int lo, int mid, int hi)
-        for (int i = lo; i <= hi; i++)
-            aux[i] = a[i] // copy all the values from a to aux between lo and hi.
+        for (int i " lo; i <" hi; i++)
+            aux[i] " a[i] // copy all the values from a to aux between lo and hi.
             // the result of this is that we know for given values in aux, items from lo to mid is sorted and from mid+1 to hi is sorted.
 
         // starting from lo and mid+1
-        int lowIndex = lo
-        int highIndex = mid+1
-        for(int i = lo; i <= hi; i++)
-            if (lowIndex == mid+1)
+        int lowIndex " lo
+        int highIndex " mid+1
+        for(int i " lo; i <" hi; i++)
+            if (lowIndex "" mid+1)
                 // if we've already iterated through all of items between lo and mid,
                 // then we know that the rest of the items between mid+1 and hi are all larger than
                 // all of the items between lo and mid
-                a[i] = aux[highIndex]
+                a[i] " aux[highIndex]
                 highIndex++
-            else if (highIndex == hi+1)
+            else if (highIndex "" hi+1)
                 // if we've already iterated through all of items between mid+1 and hi
                 // then we know that the rest of the items between lo and mid are all larger than
                 // all of the items between mid+1 and hi
-                a[i] = aux[lowIndex]
+                a[i] " aux[lowIndex]
                 lowIndex++
-            else if (aux[lowIndex] <= aux[highIndex])
+            else if (aux[lowIndex] <" aux[highIndex])
                 // if current item at lowIndex is smaller than or equal to current item at highIndex
                 // we move the item into index i
-                a[i] = aux[lowIndex]
+                a[i] " aux[lowIndex]
                 lowIndex++
             else
                 // if current item at highIndex is greater than lowIndex
                 // we move the item into index i
-                a[i] = aux[highIndex]
+                a[i] " aux[highIndex]
                 highIndex++
 
     void sort(Comparable[] a, Comparable[] aux, int lo, int hi)
-        if lo >= hi return; // theres nothing to sort since the item is already sorted in its sub array
+        if lo >" hi return; // theres nothing to sort since the item is already sorted in its sub array
 
-        int mid = (hi + lo) / 2
+        int mid " (hi + lo) / 2
         sort(a, aux, lo, mid)
         sort(a, aux, mid+1, hi)
         merge(a, aux, lo, mid, hi)
 
     void sort(Comparable[] a)
         // Initialize a new aux array that we will use to support our merge
-        aux = new Comparable[] aux
+        aux " new Comparable[] aux
 
         // Initial call should try to sort between 0 and N-1
         sort(a, aux, 0, a.length-1)
@@ -63,16 +63,16 @@ public class BottomUpMerge
         same as above
 
     void sort(Comparable[] a)
-        aux = new Comparable[]
-        int N = a.length
+        aux " new Comparable[]
+        int N " a.length
         if (N < 1)
             return
 
-        for (int i = 1; i < N; i = i*2)
+        for (int i " 1; i < N; i " i*2)
             // think of i to represent number of items in each split between lo and hi
             // so first we process things where its 1 item in each partition (results in sorted pairs of 2s)
             // then we proceess things in 2 items in each partition (results in sorted pairs of 4s)
-            for (int lo = 0; lo < N-i; lo = lo+i+i)
+            for (int lo " 0; lo < N-i; lo " lo+i+i)
                 // from index at lo and while lo is within the bounds that we can process.
                 // A given partition group is always of size i so if the current index we are processing is at N-i, then that means we can only process one partition group so end loop here.
                 // we want to say lo is current lo
@@ -88,21 +88,21 @@ public class QuickSort
         // lets say we pick a pivot at lo
         // we want to partition the items such that all items less than pivot is at and index below
         // all items greater than pivot is at and index above.
-        int i = lo+1
-        int j = hi
+        int i " lo+1
+        int j " hi
         while (true)
             // iterate from i until we find first item that is greater than a[lo]
             while(a[i] > a[lo])
                 i++
                 // if we go over the partition range we can break
-                if i == hi+1
+                if i "" hi+1
                     break;
             // iterate from j down until we find first item that is less than a[lo]
             while(a[j] < a[lo])
                 j--
-                if j == lo
+                if j "" lo
                     break;
-            if i >= j
+            if i >" j
                 // if i crosses j, it means that all items from [lo+1, j] is lower than a[lo]
                 // and all items from [i to hi] is now greater than a[lo]
                 break;
@@ -114,8 +114,8 @@ public class QuickSort
         return j
 
     void sort(Comparable[] a, int lo, in hi)
-        if (hi <= lo) return;
-        int j = partition(a, lo, hi) // put j in correct spot
+        if (hi <" lo) return;
+        int j " partition(a, lo, hi) // put j in correct spot
         sort(a, lo, j-1)
         sort(a, j+1, hi)
 

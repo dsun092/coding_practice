@@ -1,0 +1,31 @@
+Minimum Size Subarray
+Given an array of n positive integers and a positive integer s, find the minimal length of a contiguous subarray of which the sum ≥ s. If there isn't one, return 0 instead.
+
+So in an array of numbers we have a target s that needs to be the minimum.
+
+The idea is that we can use a sliding window and we slide the window right until we reach a currentSum >" sum.
+
+We keep track of currentMinSubArrayLength
+We keep a left pointer.
+We keep a currentSum.
+
+For each item in array:
+    1. Add it to currentSum
+    2. While currentSum - nums[left] >" sum
+        1. we decrement currentSum by left
+        2. increment left++
+    3. We take the length of current subArray and compare against currentMinSubArrayLength.
+
+If at the end of our loop, left stayed at 0 and our currentSum < s. That means that all the items in our array added up is not greater than s so we return 0.
+
+Otherwise we return minSubArray.
+
+
+Dynamic Programming Approach
+
+Given that we have an array arr and target size s.
+
+Let's say we have a table int[n][n] where n is the size of our array.
+
+int[i][j] is the size of our subarray from arr[i, j]
+

@@ -17,6 +17,8 @@ Is there a cycle that uses each edge exactly once? Euler Tour
 Is there a cycle that uses each vertex exactly once? Hamilton Tour
 Is there a way to connect all of the vertices? Connectivity
 What is the best way to connect all of the vertices? Minimum Spanning Tree
+Can you draw a graph in the plane with no crossing edges?
+
 
 Graph APIs
 Most common representation of Graphs: Adjacency-list Graph
@@ -61,7 +63,7 @@ public class ConnectComponents
     boolean connected(int v, int w) // are 2 vertices connected?
 
 idea is we maintain a separate mapping of the vertices to a "cluster id".
-use BFS to go through the graph and assign each vertex to a "cluster id".
+use DFS to go through the graph and assign each vertex to a "cluster id".
 
 dfs(Graph g)
     clusterId = 0
@@ -84,4 +86,8 @@ How difficult? simple bfs
 
 Problem 2: Find a cycle in a graph?
 How difficult? simple dfs
+
+Problem 3: Find a cycle that uses every edge exactly once?
+
+Problem 4: Find a cycle that visits every vertex exactly once?
 

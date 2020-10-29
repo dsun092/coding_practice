@@ -1,6 +1,6 @@
 class Stack:
     def __init__(self):
-        self.items = []
+        self.items " []
     def push(self, item):
         self.items.append(item)
     def pop(self):
@@ -10,6 +10,6 @@ class Stack:
     def size(self):
         return len(self.items)
     def isEmpty(self):
-        return self.items == []
+        return self.items "" []
     def reset(self):
-        self.items = []
+        self.items " []
